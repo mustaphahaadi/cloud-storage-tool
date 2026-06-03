@@ -1,0 +1,239 @@
+PROJECT PROPOSAL
+Title
+Heuristic Approach to Storage Resource Allocation for Cost Reduction and Service Level Agreement-
+Aware Availability
+
+
+1. Introduction
+The rapid adoption of cloud computing has significantly increased the demand for efficient storage
+resource management. Organizations rely on cloud storage services to provide reliable data availability
+while maintaining operational costs within acceptable limits. However, improper allocation of storage
+resources often leads to over-provisioning, under-utilization, increased operational expenses, and
+potential violations of Service Level Agreements (SLAs).
+
+
+Traditional storage allocation techniques may not adequately balance cost optimization and availability
+requirements. Heuristic approaches offer practical solutions by generating near-optimal allocation
+decisions within reasonable computational time. This project proposes the development of a heuristic-
+based storage resource allocation system that minimizes storage costs while ensuring SLA-aware
+availability requirements are met.
+
+
+To demonstrate and evaluate the effectiveness of the proposed approach, a software platform will be
+developed using Streamlit, providing visualization, monitoring, recommendation, and reporting
+functionalities.
+
+
+2. Problem Statement
+Cloud service providers and organizations frequently face challenges in allocating storage resources
+efficiently. Excessive resource allocation results in unnecessary costs, while insufficient allocation can
+lead to SLA violations and reduced service availability.
+
+
+There is a need for an intelligent allocation mechanism capable of balancing storage cost and
+availability requirements while providing administrators with actionable recommendations and real-
+time visibility into resource utilization.
+
+
+3. Aim
+To design and implement a heuristic-based storage resource allocation system that reduces storage
+costs while maintaining SLA-aware availability requirements.
+
+
+4. Objectives
+     1. To study existing cloud storage allocation strategies and SLA management techniques.
+     2. To design a heuristic algorithm for storage resource allocation.
+     3. To develop a software platform for storage monitoring and optimization.
+     4. To implement cost estimation and SLA compliance evaluation mechanisms.
+     5. To generate storage allocation recommendations based on workload requirements.
+
+
+
+
+                                                      1
+    6. To evaluate the performance of the proposed heuristic approach against baseline allocation
+       methods.
+
+
+5. Scope of the Project
+The project will focus on:
+
+
+      • Cloud storage resource allocation.
+      • Cost optimization strategies.
+      • SLA-aware availability management.
+      • Workload-based allocation recommendations.
+      • Storage utilization monitoring.
+      • Reporting and analytics.
+
+The project will not focus on:
+
+
+      • Physical hardware management.
+      • Network optimization.
+      • Real-time production cloud deployment.
+
+
+6. Methodology
+
+Phase 1: Requirement Analysis
+
+      • Review literature on storage resource allocation.
+      • Study SLA metrics and cloud storage pricing models.
+      • Identify key optimization parameters.
+
+Phase 2: System Design
+
+Design the architecture consisting of:
+
+
+      • User Interface Layer
+      • Allocation Engine
+      • Cost Analysis Module
+      • SLA Evaluation Module
+      • Reporting Module
+      • Database Layer
+
+Phase 3: Heuristic Algorithm Development
+
+Inputs:
+
+
+      • Storage demand
+      • Availability requirements
+      • Budget constraints
+      • Access frequency
+
+Outputs:
+
+
+      • Recommended storage allocation
+      • Estimated cost
+
+
+
+                                                  2
+     • Expected availability level
+
+Phase 4: Software Development
+
+Develop a Streamlit-based application containing:
+
+
+Dashboard
+
+     • Total storage allocation
+     • Resource utilization
+     • Cost overview
+     • SLA compliance metrics
+
+Allocation Module
+
+Users provide:
+
+
+     • Required storage size
+     • Expected workload
+     • Availability requirement
+
+System generates:
+
+
+     • Allocation recommendation
+     • Cost estimate
+     • Availability prediction
+
+Monitoring Module
+
+     • Storage growth trends
+     • Utilization charts
+     • Cost analysis charts
+
+Reporting Module
+
+     • SLA reports
+     • Allocation reports
+     • Cost optimization reports
+
+Phase 5: Testing and Evaluation
+
+Evaluate:
+
+
+     • Cost reduction percentage
+     • SLA compliance rate
+     • Resource utilization efficiency
+     • Algorithm execution time
+
+
+
+
+                                                    3
+7. Proposed Technologies
+Frontend:
+
+
+      • Streamlit
+
+Backend:
+
+
+      • Python
+
+Database:
+
+
+      • SQLite or PostgreSQL
+
+Libraries:
+
+
+      • Pandas
+      • NumPy
+      • Plotly
+      • Matplotlib
+      • Scikit-learn (optional)
+
+Development Tools:
+
+
+      • VS Code
+      • GitHub
+
+
+8. Expected Outcomes
+The project is expected to:
+
+
+      • Reduce storage allocation costs.
+      • Improve storage utilization efficiency.
+      • Maintain SLA-aware availability requirements.
+      • Provide intelligent allocation recommendations.
+      • Offer administrators a user-friendly monitoring dashboard.
+
+
+9. Significance of the Study
+This research contributes to cloud resource optimization by demonstrating how heuristic techniques
+can improve storage allocation decisions. The developed software platform provides a practical tool for
+evaluating allocation strategies and supporting decision-making in cloud environments.
+
+
+10. Deliverables
+      • Heuristic allocation algorithm.
+      • Streamlit-based web application.
+      • Storage optimization dashboard.
+      • Cost estimation module.
+      • SLA monitoring module.
+      • Final project report.
+
+
+
+
+                                                   4
+• User documentation.
+
+
+
+
+                        5
+
