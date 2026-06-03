@@ -38,7 +38,13 @@ cloud-optimized/
    cd /path/to/cloud-optimized
    ```
 
-2. Install the required dependencies:
+2. Create and activate a Python virtual environment (recommended to avoid system-wide package conflicts):
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
+
+3. Install the required dependencies:
    ```bash
    pip install -r requirements.txt
    ```
