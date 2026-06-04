@@ -12,11 +12,11 @@ def generate_mock_data():
     for _ in range(20):
         # Random inputs
         req_size = random.choice([50, 100, 500, 1000, 2000, 5000])
-        workload = random.choice([500, 1000, 5000, 20000, 50000])
+        latency = random.choice([5.0, 15.0, 60.0])
         availability = random.choice([99.0, 99.9, 99.99, 99.999])
         budget = random.choice([0, 50, 100, 500]) # 0 means no budget
         
-        result = heuristic.allocate_storage(req_size, workload, availability, budget if budget > 0 else None)
+        result = heuristic.allocate_storage(req_size, availability, latency, budget if budget > 0 else None)
         
         if result["success"]:
             # Random date within last 30 days
@@ -28,10 +28,10 @@ def generate_mock_data():
             cursor = conn.cursor()
             cursor.execute("""
                 INSERT INTO allocations 
-                (required_size, workload_iops, availability_req, budget, recommended_tier_id, cost_estimate, availability_prediction, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """, (req_size, workload, availability, budget if budget > 0 else None, 
-                  result["tier_id"], result["cost_estimate"], result["availability_prediction"], created_at.isoformat()))
+                (required_size, availability_req, latency_req, budget, recommended_tier_id, cost_estimate, availability_prediction, latency_prediction, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (req_size, availability, latency, budget if budget > 0 else None, 
+                  result["tier_id"], result["cost_estimate"], result["availability_prediction"], result["latency_prediction"], created_at.isoformat()))
             conn.commit()
             conn.close()
 

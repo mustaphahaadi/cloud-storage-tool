@@ -20,8 +20,8 @@ def app():
     total_cost = df['cost_estimate'].sum()
     total_allocations = len(df)
     
-    # Calculate SLA compliance (assuming requested SLA <= predicted SLA)
-    sla_compliant = len(df[df['availability_prediction'] >= df['availability_req']])
+    # Calculate SLA compliance (assuming requested SLA <= predicted SLA and latency_prediction <= latency_req)
+    sla_compliant = len(df[(df['availability_prediction'] >= df['availability_req']) & (df['latency_prediction'] <= df['latency_req'])])
     sla_rate = (sla_compliant / total_allocations) * 100 if total_allocations > 0 else 0
     
     col1.metric("Total Storage Allocated", f"{total_allocated:,.2f} GB")

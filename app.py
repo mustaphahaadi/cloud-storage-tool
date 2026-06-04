@@ -5,20 +5,20 @@ from modules import dashboard, allocation, monitoring, reporting
 # Initialize Database
 database.init_db()
 
-st.set_page_config(page_title="Storage Allocation System", layout="wide", page_icon="🗄️")
+st.set_page_config(page_title="SLA-Aware Cloud Storage Allocation Optimizer", layout="wide", page_icon="🗄️")
 
-st.sidebar.title("Navigation")
-menu = ["Dashboard", "Storage Allocation", "Monitoring", "Reporting"]
+st.sidebar.title("System Navigation")
+menu = ["Dashboard", "Allocation Simulation", "Performance Monitoring", "Reporting & Evaluation"]
 choice = st.sidebar.radio("Go to", menu)
 
 st.sidebar.markdown("---")
-st.sidebar.info("Heuristic Approach to Storage Resource Allocation for Cost Reduction and SLA-Aware Availability.")
+st.sidebar.info("Heuristic Approach to Storage Resource Allocation for Cost Reduction and Service Level Agreement (SLA)-Aware Availability.")
 
 if choice == "Dashboard":
     dashboard.app()
-elif choice == "Storage Allocation":
+elif choice == "Allocation Simulation":
     allocation.app()
-elif choice == "Monitoring":
+elif choice == "Performance Monitoring":
     monitoring.app()
-elif choice == "Reporting":
+elif choice == "Reporting & Evaluation":
     reporting.app()
