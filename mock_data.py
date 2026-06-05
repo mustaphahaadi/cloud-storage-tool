@@ -16,7 +16,11 @@ def generate_mock_data():
         availability = random.choice([99.0, 99.9, 99.99, 99.999])
         budget = random.choice([0, 50, 100, 500]) # 0 means no budget
         
-        result = heuristic.allocate_storage(req_size, availability, latency, budget if budget > 0 else None)
+        # Select random alpha/beta combination
+        alpha = random.choice([0.1, 0.3, 0.5, 0.7, 0.9])
+        beta = round(1.0 - alpha, 1)
+        
+        result = heuristic.allocate_storage(req_size, availability, latency, budget if budget > 0 else None, alpha=alpha, beta=beta)
         
         if result["success"]:
             # Random date within last 30 days
@@ -28,9 +32,9 @@ def generate_mock_data():
             cursor = conn.cursor()
             cursor.execute("""
                 INSERT INTO allocations 
-                (required_size, availability_req, latency_req, budget, recommended_tier_id, cost_estimate, availability_prediction, latency_prediction, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (req_size, availability, latency, budget if budget > 0 else None, 
+                (required_size, availability_req, latency_req, budget, alpha, beta, recommended_tier_id, cost_estimate, availability_prediction, latency_prediction, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (req_size, availability, latency, budget if budget > 0 else None, alpha, beta,
                   result["tier_id"], result["cost_estimate"], result["availability_prediction"], result["latency_prediction"], created_at.isoformat()))
             conn.commit()
             conn.close()

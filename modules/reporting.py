@@ -21,7 +21,7 @@ def app():
     
     # Compute total cost and SLA compliance for all algorithms
     stats = {
-        "Proposed Heuristic (Greedy)": {"cost": 0.0, "compliant": 0},
+        "Proposed Heuristic (α-β)": {"cost": 0.0, "compliant": 0},
         "First Fit": {"cost": 0.0, "compliant": 0},
         "Best Fit": {"cost": 0.0, "compliant": 0},
         "Worst Fit": {"cost": 0.0, "compliant": 0}
@@ -32,10 +32,10 @@ def app():
         avail_req = row['availability_req']
         lat_req = row['latency_req']
         
-        # Heuristic (stored in DB)
-        stats["Proposed Heuristic (Greedy)"]["cost"] += row['cost_estimate']
+        # Proposed Heuristic (stored in DB)
+        stats["Proposed Heuristic (α-β)"]["cost"] += row['cost_estimate']
         if (row['availability_prediction'] >= avail_req) and (row['latency_prediction'] <= lat_req):
-            stats["Proposed Heuristic (Greedy)"]["compliant"] += 1
+            stats["Proposed Heuristic (α-β)"]["compliant"] += 1
             
         # Run baselines
         # First Fit
@@ -89,7 +89,8 @@ def app():
     
     st.subheader("SLA Compliance Log")
     df['sla_met'] = (df['availability_prediction'] >= df['availability_req']) & (df['latency_prediction'] <= df['latency_req'])
-    sla_compliance_df = df[['id', 'created_at', 'required_size', 'availability_req', 'availability_prediction', 'latency_req', 'latency_prediction', 'recommended_tier', 'sla_met']]
+    # include alpha/beta in display
+    sla_compliance_df = df[['id', 'created_at', 'required_size', 'availability_req', 'availability_prediction', 'latency_req', 'latency_prediction', 'recommended_tier', 'alpha', 'beta', 'sla_met']]
     st.dataframe(sla_compliance_df, use_container_width=True)
     
     st.markdown("---")
@@ -113,6 +114,8 @@ def app():
         'availability_req': 'Availability Req (%)',
         'latency_req': 'Latency Req (ms)',
         'budget': 'Budget ($)',
+        'alpha': 'Alpha (Cost Wt)',
+        'beta': 'Beta (Avail Wt)',
         'recommended_tier': 'Recommended Tier',
         'cost_estimate': 'Cost Estimate ($)',
         'availability_prediction': 'Availability Pred (%)',

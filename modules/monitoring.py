@@ -36,7 +36,7 @@ def app():
     
     st.subheader("Recent Allocation Profiles (Latency vs Size)")
     fig_scatter = px.scatter(df, x='required_size', y='latency_req', color='recommended_tier',
-                             size='cost_estimate', hover_data=['availability_req', 'latency_prediction', 'availability_prediction'],
+                             size='cost_estimate', hover_data=['availability_req', 'latency_prediction', 'availability_prediction', 'alpha', 'beta'],
                              labels={'required_size': 'Size (GB)', 'latency_req': 'Max Tolerable Latency (ms)', 'recommended_tier': 'Storage Tier'},
                              title="Allocation Profile: Size vs Latency Requirement")
     st.plotly_chart(fig_scatter, use_container_width=True)

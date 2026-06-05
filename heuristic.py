@@ -50,10 +50,10 @@ def allocate_worst_fit(tiers_df, required_size, availability_req, latency_req):
         "latency_prediction": float(best_tier['access_latency'])
     }
 
-def allocate_storage(required_size, availability_req, latency_req, budget=None):
+def allocate_storage(required_size, availability_req, latency_req, budget=None, alpha=0.5, beta=0.5):
     """
-    Heuristic greedy cost-optimization algorithm to allocate storage based on requirements.
-    Selects the most cost-effective tier that meets SLA and access latency requirements.
+    Heuristic alpha-beta dual-objective scoring algorithm to allocate storage based on requirements.
+    Balances cost optimization and SLA availability deviation using a weighted scoring model.
     """
     tiers_df = get_storage_tiers()
     
@@ -81,10 +81,30 @@ def allocate_storage(required_size, availability_req, latency_req, budget=None):
                 "success": False,
                 "message": f"No storage tier meets the requirements within budget. Closest option: {min_cost_tier['name']} at ${min_cost_tier['total_cost']:.2f}"
             }
-        eligible_tiers = budget_eligible
+        eligible_tiers = budget_eligible.copy()
         
-    # Select the lowest cost tier (Greedy cost optimization)
-    best_tier = eligible_tiers.loc[eligible_tiers['total_cost'].idxmin()]
+    # Compute normalized objectives for the multi-objective scoring
+    eligible_tiers['unavailability'] = 1.0 - (eligible_tiers['sla_availability'] / 100.0)
+    
+    min_cost = eligible_tiers['total_cost'].min()
+    max_cost = eligible_tiers['total_cost'].max()
+    min_unavail = eligible_tiers['unavailability'].min()
+    max_unavail = eligible_tiers['unavailability'].max()
+    
+    cost_range = max_cost - min_cost
+    unavail_range = max_unavail - min_unavail
+    
+    scores = []
+    for idx, row in eligible_tiers.iterrows():
+        c_norm = (row['total_cost'] - min_cost) / cost_range if cost_range > 0 else 0.0
+        u_norm = (row['unavailability'] - min_unavail) / unavail_range if unavail_range > 0 else 0.0
+        score = alpha * c_norm + beta * u_norm
+        scores.append(score)
+        
+    eligible_tiers['score'] = scores
+    
+    # Select the tier that minimizes the weighted score
+    best_tier = eligible_tiers.loc[eligible_tiers['score'].idxmin()]
     
     # Run comparative baseline algorithms for comparison
     baselines = {

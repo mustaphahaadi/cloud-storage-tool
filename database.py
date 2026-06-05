@@ -31,6 +31,8 @@ def init_db():
         availability_req REAL NOT NULL,
         latency_req REAL NOT NULL,
         budget REAL,
+        alpha REAL DEFAULT 0.5,
+        beta REAL DEFAULT 0.5,
         recommended_tier_id INTEGER,
         cost_estimate REAL NOT NULL,
         availability_prediction REAL NOT NULL,
@@ -64,22 +66,22 @@ def get_storage_tiers():
     conn.close()
     return df
 
-def save_allocation(required_size, availability_req, latency_req, budget, tier_id, cost_estimate, availability_prediction, latency_prediction):
+def save_allocation(required_size, availability_req, latency_req, budget, alpha, beta, tier_id, cost_estimate, availability_prediction, latency_prediction):
     conn = get_connection()
     cursor = conn.cursor()
     created_at = datetime.now().isoformat()
     cursor.execute("""
         INSERT INTO allocations 
-        (required_size, availability_req, latency_req, budget, recommended_tier_id, cost_estimate, availability_prediction, latency_prediction, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (required_size, availability_req, latency_req, budget, tier_id, cost_estimate, availability_prediction, latency_prediction, created_at))
+        (required_size, availability_req, latency_req, budget, alpha, beta, recommended_tier_id, cost_estimate, availability_prediction, latency_prediction, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (required_size, availability_req, latency_req, budget, alpha, beta, tier_id, cost_estimate, availability_prediction, latency_prediction, created_at))
     conn.commit()
     conn.close()
 
 def get_allocation_history():
     conn = get_connection()
     query = """
-        SELECT a.id, a.required_size, a.availability_req, a.latency_req, a.budget, 
+        SELECT a.id, a.required_size, a.availability_req, a.latency_req, a.budget, a.alpha, a.beta,
                t.name as recommended_tier, a.cost_estimate, a.availability_prediction, a.latency_prediction, a.created_at
         FROM allocations a
         LEFT JOIN storage_tiers t ON a.recommended_tier_id = t.id
