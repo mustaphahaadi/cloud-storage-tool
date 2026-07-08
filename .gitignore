@@ -1,8 +1,8 @@
 # Ignore venv
 .venv/
+.env
+.gitignore
 
-# Ignore docs
-docs/
 __pycache__
 
 #FASTAPI
