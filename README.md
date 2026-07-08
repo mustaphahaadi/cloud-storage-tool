@@ -5,7 +5,7 @@ This is a Streamlit-based web application that implements a heuristic approach t
 ## Features
 
 - **Dashboard:** An overview of total storage allocations, estimated costs, and overall SLA compliance rate, visualized with interactive charts.
-- **Allocation Engine:** A smart heuristic algorithm that takes user inputs (required size, expected workload, availability requirement, and budget constraints) to recommend the most cost-effective cloud storage tier.
+- **Allocation Engine:** A smart heuristic algorithm that takes user inputs (required size, access latency requirement, availability requirement, and budget constraints) to recommend the most cost-effective cloud storage tier.
 - **Monitoring:** Time-series tracking of storage growth, cumulative cost trends, and workload distribution.
 - **Reporting:** Detailed tabular breakdowns of allocation history and SLA compliance, with the ability to export data to CSV.
 
@@ -65,8 +65,8 @@ cloud-optimized/
 
 ## Storage Tiers Modelled
 
-The application simulates 4 common cloud storage tiers:
-- **High-Performance (NVMe):** For mission-critical workloads (Max 100k IOPS, 99.999% SLA).
-- **Standard (SSD):** For general-purpose applications (Max 10k IOPS, 99.99% SLA).
-- **Capacity (HDD):** For bulk storage (Max 1k IOPS, 99.9% SLA).
-- **Archive (Cold Storage):** For long-term data retention (Max 100 IOPS, 99.0% SLA).
+The application simulates 3 cloud storage tiers as defined in the literature:
+- **Block Storage:** For low-latency workloads (e.g., databases) with 99.999% SLA availability and 2.0 ms latency, costing $0.15 per GB.
+- **File Storage:** For general-purpose applications with 99.99% SLA availability and 10.0 ms latency, costing $0.08 per GB.
+- **Object Storage:** For backup, archiving, and unstructured data with 99.0% SLA availability and 50.0 ms latency, costing $0.02 per GB.
+

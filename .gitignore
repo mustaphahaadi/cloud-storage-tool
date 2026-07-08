@@ -1,0 +1,8 @@
+# Ignore venv
+.venv/
+
+# Ignore docs
+docs/
+__pycache__
+
+#FASTAPI
