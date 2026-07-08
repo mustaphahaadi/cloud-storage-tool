@@ -1,23 +1,23 @@
 # CHAPTER THREE: METHODOLOGY AND SYSTEM DESIGN
 
 ## 3.0 Introduction
-This chapter presents the methodology and system design of the SLA-Aware Storage Resource Allocation Optimizer. It details the research approach, requirements analysis, system design, tools, database schema, and the mathematical scoring algorithm used to allocate storage resources. Additionally, it outlines the validation and testing plans to evaluate the performance of the proposed greedy heuristic scoring approach against traditional baselines.
+This chapter explains how the research and system development were carried out. It details the research methodology, requirements analysis, tools and technologies, system design, algorithm description, dataset properties, testing strategy, and ethical considerations for the SLA-Aware Storage Resource Allocation Optimizer.
 
 ---
 
 ## 3.1 Research Methodology
 
-### 3.1.1 Research Approach
-This study adopts the **Design Science Research (DSR)** methodology. DSR is a problem-solving paradigm that guides the design, implementation, and evaluation of software artifacts to address real-world business and technical challenges. In this study, the artifact developed is an SLA-aware cloud storage allocation simulation software that uses a multi-objective greedy heuristic algorithm to minimize storage costs while satisfying customer availability and latency SLAs.
+### 3.1.1 Research approach
+This study adopts the **Design Science Research (DSR)** framework. DSR focuses on solving complex real-world problems through the creation, implementation, and evaluation of innovative human-designed artifacts (e.g., software applications, algorithms, or models). The software artifact developed in this project is a cost-reduction and SLA-aware cloud storage allocation simulation tool that utilizes a multi-objective greedy scoring heuristic.
 
-### 3.1.2 Data Collection Methods
-Because deploying this system in a real-world cloud environment is costly and carries risks of data loss during testing, data is collected and processed through simulation. 
-*   **Simulation Dataset:** Historical client requests are generated using public cloud storage characteristics (Block, File, and Object tiers).
-*   **Attributes Collected:** Each request profile contains storage capacity demand (GB), SLA availability requirements (%), access latency requirements (ms), and budget constraints ($).
-*   **Mock Generator:** A simulation script (`mock_data.py`) generates random requests based on real-world workload characteristics to populate the database for trend and compliance analysis.
+### 3.1.2 Data collection methods
+Because testing allocation algorithms in a live production cloud environment carries high costs and risks of data disruption, data collection is performed via simulation:
+*   **Simulation Dataset:** A database of requests is created based on the technical specifications (SLA availability, cost, latency) of standard public cloud storage.
+*   **Attributes Captured:** Data on user storage demand (size in GB), availability SLA targets (%), latency tolerance (ms), and budget boundaries ($) are collected and recorded.
+*   **Mock Workload Generator:** A workload generation script (`mock_data.py`) generates random allocation scenarios to simulate realistic operational demand.
 
-### 3.1.3 System Development Methodology
-The system was developed using the **Agile Software Development methodology**, specifically the **Scrum** framework. Scrum is selected due to its iterative nature, enabling continuous refinement of the heuristic algorithm, database schema, and frontend UI in short development sprints.
+### 3.1.3 System development methodology
+The project employs the **Agile software development methodology**, specifically the **Scrum** framework. Agile Scrum is selected to accommodate iterative coding, testing, and supervisor feedback loops. Sprints are organized to incrementally deliver backend database logic, the recommendation scoring engine, and frontend web visualizations.
 
 ```mermaid
 graph TD
@@ -31,43 +31,43 @@ graph TD
 
 ## 3.2 Requirements Analysis
 
-### 3.2.1 Functional Requirements (FR)
-Functional requirements describe the core actions and operations the software must perform.
+### 3.2.1 Functional Requirements
+Functional requirements define the specific actions the system must perform:
+*   **FR1: Storage Parameter Input:** The system must capture user inputs for required size (GB), maximum latency (ms), target SLA availability (%), and optional budget ($).
+*   **FR2: Heuristic Recommendation:** The system must compute allocation scores and recommend the optimal storage tier based on the lowest score.
+*   **FR3: Comparative Evaluation:** The system must execute baseline algorithms (First Fit, Best Fit, Worst Fit) under identical inputs to compare performance metrics.
+*   **FR4: Persistent Log Database:** The system must save recommendation records and performance evaluations to a local database.
+*   **FR5: Analytics Dashboard:** The system must render interactive charts showing storage utilization, costs, and compliance trends.
+*   **FR6: Report Exporting:** The system must enable users to export all historical allocation records to a CSV file.
 
-*   **FR1: Requirement Input Capture:** The system must capture user storage needs, including required storage capacity (GB), maximum tolerable access latency (ms), target SLA availability (99.0% to 99.999%), and optional budget constraints.
-*   **FR2: Heuristic Recommendation:** The system must run a multi-objective scoring heuristic based on user input to identify the most cost-effective storage tier.
-*   **FR3: Baseline Comparison:** The system must execute traditional baseline algorithms (First Fit, Best Fit, Worst Fit) for the same inputs to provide comparative data.
-*   **FR4: Historical Log Logging:** All generated recommendations must be recorded in a local SQLite database for compliance audit.
-*   **FR5: Visualization Dashboard:** The system must display graphical breakdowns of storage growth, cost trends, and tier utilization.
-*   **FR6: Report Export:** Users must be able to export detailed historical logs to a CSV file.
+### 3.2.2 Non-Functional Requirements
+Non-functional requirements describe performance constraints and quality attributes of the system:
+*   **NFR1: Performance & Speed:** The scoring heuristic must execute and return recommendations in less than 500 milliseconds.
+*   **NFR2: Security:** All database transactions must employ SQL parameterization to prevent SQL Injection, and data must be stored locally to ensure access control.
+*   **NFR3: Usability:** The user interface must be intuitive, displaying forms, indicators, and help tooltips that can be navigated with minimal training.
+*   **NFR4: Reliability:** The system must maintain consistent SQLite state and handle errors gracefully when inputs are empty or no feasible storage tier exists.
 
-### 3.2.2 Non-Functional Requirements (NFR)
-Non-functional requirements specify the quality attributes and constraints of the system.
-
-*   **NFR1: Performance & Latency:** The recommendation engine must calculate scores and return a recommended tier in less than 500 milliseconds.
-*   **NFR2: Usability:** The user interface must be clean, web-based, and intuitive, utilizing interactive input sliders and dropdown selections.
-*   **NFR3: Reliability:** The SQLite database must maintain transactional integrity (ACID properties) to ensure that allocation records are never corrupted.
-*   **NFR4: Portability:** The application must run on any modern web browser via the Streamlit server framework on Windows, macOS, or Linux.
+### 3.2.3 User Requirements / User Stories
+User requirements explain system utility from the perspective of target users:
+*   *User Story 1:* As a Storage Administrator, I want to input capacity, availability, and latency needs so that I can immediately find the most cost-effective cloud storage tier that meets my SLAs.
+*   *User Story 2:* As a Cloud Provider, I want to adjust the slider weights ($\alpha$ and $\beta$) between cost and availability so that the algorithm's recommendations align with my changing business budgets and operational priorities.
+*   *User Story 3:* As an IT Compliance Auditor, I want to view a historical log of all recommendations and export them so that I can verify that SLA targets are being consistently met.
 
 ---
 
-## 3.3 Tools and Technologies
+## 3.3 Tools and Technologies Used
 
-The technologies selected for implementation are chosen for their lightweight nature, performance, and compatibility:
-
-*   **Python 3.8+:** Chosen as the primary programming language because of its rich scientific ecosystem, readability, and compatibility with data analysis libraries.
-*   **Streamlit (v1.32.2):** Selected as the frontend framework. It abstracts HTML/CSS and enables rapid deployment of interactive data-driven dashboards directly in Python.
-*   **SQLite3:** Utilized as the database management system. SQLite is zero-configuration, serverless, and stores data in a single file, making it highly portable.
-*   **Pandas & NumPy:** Used for structural data frames and mathematical computations during scoring and log processing.
-*   **Plotly Express:** Used to generate high-performance, interactive charts (pie charts, line graphs, and scatter plots) for the dashboard.
-*   **Visual Studio Code (VS Code):** Used as the primary Integrated Development Environment (IDE).
+*   **Programming language(s):** **Python 3.8+** is selected for its high readability, extensive scientific libraries, and ease of mathematical scoring implementation.
+*   **Frameworks/libraries:** **Streamlit (v1.32.2)** is used as the frontend framework. **Pandas** and **NumPy** are used for data frame manipulation and numeric arrays. **Plotly Express** is utilized to generate interactive data visualizations.
+*   **Database systems:** **SQLite3** is used as the database backend. It is serverless, zero-configuration, and stores the schema and logs inside a single database file (`storage_allocation.db`).
+*   **Development tools (e.g., IDEs):** **Visual Studio Code (VS Code)** is used as the primary Integrated Development Environment.
 
 ---
 
 ## 3.4 System Design
 
-### 3.4.1 System Architecture
-The application is structured using a **Three-Tier Architectural Model** to maintain separation of concerns:
+### 3.4.1 System architecture diagram
+The system follows a three-tier architecture structure:
 
 ```mermaid
 graph LR
@@ -84,12 +84,12 @@ graph LR
     HE <--> DB
 ```
 
-1.  **Presentation Layer:** Built with Streamlit, handling the web interface, rendering metrics cards, data tables, and input forms.
-2.  **Application Logic Layer:** The core recommendation engine (`heuristic.py`) containing the greedy scoring mathematical algorithm.
-3.  **Data Layer:** The SQLite database (`database.py` and `storage_allocation.db`), responsible for schema storage, querying, and logging.
+*   **Presentation Layer:** Provides the Web UI, input forms, and data visualizations.
+*   **Application Logic Layer:** Houses `heuristic.py` which runs the allocation scoring calculations and selects tiers.
+*   **Data Layer:** Stores historical recommendations and storage tier metrics in SQLite.
 
-### 3.4.2 Use Case Diagram
-The use case diagram highlights the system interactions available to the Storage Administrator:
+### 3.4.2 Use case diagram
+The use case diagram highlights the interactions available to the Storage Administrator:
 
 ```mermaid
 usecaseDiagram
@@ -101,8 +101,8 @@ usecaseDiagram
     Admin --> (Export Compliance Reports)
 ```
 
-### 3.4.3 Database Design (Entity Relationship Diagram)
-The database structure is normalized into two relational tables to minimize data redundancy:
+### 3.4.3 Database design (ERD)
+The database schema consists of a one-to-many relationship between storage tiers and allocations:
 
 ```mermaid
 erDiagram
@@ -130,8 +130,8 @@ erDiagram
     storage_tiers ||--o{ allocations : "recommends"
 ```
 
-### 3.4.4 Activity Diagram (Allocation Process)
-The workflow for evaluating and logging a storage allocation recommendation is detailed below:
+### 3.4.4 Activity diagram
+The activity diagram models the operational logic flow when generating a storage recommendation:
 
 ```mermaid
 stateDiagram-v2
@@ -148,43 +148,42 @@ stateDiagram-v2
     ShowError --> [*]
 ```
 
-### 3.4.5 Input and Output Design
-*   **Input Design:** The simulation interface consists of a Streamlit sidebar menu for navigation, a main input form for storage parameters (GB, MS, SLA), and an adjustable slider for the Provider Control Weight ($\alpha$).
-*   **Output Design:** Output is displayed using four-column KPIs showing recommended storage tier, monthly cost estimate, SLA availability, and access latency. A comparative pandas dataframe displays baseline comparison details.
+### 3.4.5 Input design
+The input interface features:
+1.  A Streamlit sidebar selector to toggle between Dashboard, Simulation, Monitoring, and Reporting screens.
+2.  Input numeric forms for size, maximum access latency, target availability selectboxes, and budget inputs.
+3.  An interactive slider to configure cost optimization priority ($\alpha$), which dynamically scales the unavailability weight ($\beta = 1.0 - \alpha$).
+
+### 3.4.6 Output design
+The output interface presents results dynamically:
+1.  KPI metric cards showing the Recommended Tier, Estimated Cost ($), Availability SLA (%), and Access Latency (ms).
+2.  A structured DataFrame table comparing the proposed heuristic results against First Fit, Best Fit, and Worst Fit baselines.
+3.  Interactive Plotly area and line graphs representing cumulative storage growth and cost over time.
 
 ---
 
-## 3.5 Heuristic Algorithm and Model Description
+## 3.5 Algorithm / Model Description
 
-### 3.5.1 Multi-Objective Heuristic Scoring Model
-The system optimizes two conflicting objectives: **minimizing cost** and **maximizing availability**. Since cost ($) and unavailability (%) are measured in different units, they are normalized using Min-Max scaling to a scale of $[0, 1]$:
+### 3.5.1 Algorithm / Pseudocode or flowchart
+The proposed system uses a **multi-objective greedy scoring heuristic**. Cost and unavailability are normalized via Min-Max scaling to ensure that difference in units ($ vs %) does not distort the score:
 
 $$C_{\text{norm}}(i) = \frac{\text{Cost}(i) - \text{Cost}_{\text{min}}}{\text{Cost}_{\text{max}} - \text{Cost}_{\text{min}}}$$
 
 $$U_{\text{norm}}(i) = \frac{\text{Unavailability}(i) - \text{Unavailability}_{\text{min}}}{\text{Unavailability}_{\text{max}} - \text{Unavailability}_{\text{min}}}$$
 
-Where unavailability is calculated as:
+Where:
 $$\text{Unavailability}(i) = 1.0 - \left( \frac{\text{Availability}(i)}{100} \right)$$
 
-The final score for storage tier $i$ is calculated as a weighted sum:
+The final score for storage tier $i$ is:
 $$\text{Score}(i) = \alpha \times C_{\text{norm}}(i) + \beta \times U_{\text{norm}}(i)$$
 
-Subject to the constraints:
+Subject to:
 $$\text{Availability}(i) \ge \text{Availability Requirement}$$
 $$\text{Latency}(i) \le \text{Latency Requirement}$$
 $$\text{Cost}(i) \le \text{Budget Constraint}$$
 $$\alpha + \beta = 1.0$$
 
-The tier that **minimizes** the weighted score is recommended. The weighting coefficient $\alpha$ is dynamic, allowing providers to prioritize cost reduction ($\alpha \to 1.0$) or high availability compliance ($\alpha \to 0.0$).
-
-### 3.5.2 Traditional Baseline Algorithms
-To evaluate performance, three traditional single-objective algorithms are implemented:
-*   **First Fit (FF):** Scans the database tiers in order and selects the first tier that satisfies availability and latency constraints.
-*   **Best Fit (BF):** Scans all eligible tiers and selects the one that minimizes availability slack ($\text{Availability}(i) - \text{Availability Requirement}$), minimizing over-provisioning.
-*   **Worst Fit (WF):** Selects the tier that maximizes availability slack, resulting in maximum over-provisioning.
-
-### 3.5.3 Heuristic Engine Pseudocode
-The exact logic implemented in `heuristic.py` is represented below:
+The exact pseudocode logic of the core algorithm is described below:
 
 ```text
 ALGORITHM allocate_storage
@@ -240,40 +239,46 @@ END ALGORITHM
 
 ---
 
-## 3.6 Data Description
+## 3.6 Data Description / Dataset
 
-The system processes data attributes characterized as follows:
+### 3.6.1 Source of data
+The system utilizes simulated workload dataset profiles built on standard public cloud storage tier specifications. The configurations (Block, File, Object) are sourced from standard commercial cloud storage profiles (e.g., AWS EBS, Azure Files, GCP Cloud Storage) to ensure realistic parameters.
 
-| Field Name | Data Type | Database Constraint | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique identifier for each allocation record. |
-| `required_size` | REAL | NOT NULL | The size of storage requested by the client in Gigabytes (GB). |
-| `availability_req` | REAL | NOT NULL | The minimum availability SLA percentage requested (e.g. 99.9%). |
-| `latency_req` | REAL | NOT NULL | The maximum tolerable retrieval access latency in milliseconds (ms). |
-| `budget` | REAL | NULLABLE | The maximum dollar budget allocation limit. |
-| `alpha` | REAL | DEFAULT 0.5 | The cost optimization objective weight factor. |
-| `beta` | REAL | DEFAULT 0.5 | The availability SLA compliance weight factor. |
-| `recommended_tier_id` | INTEGER | FOREIGN KEY REFERENCES `storage_tiers(id)` | The ID of the storage tier recommended by the algorithm. |
-| `cost_estimate` | REAL | NOT NULL | The calculated monthly cost of the allocation. |
-| `availability_prediction` | REAL | NOT NULL | The actual SLA availability rate provided by the selected tier. |
-| `latency_prediction` | REAL | NOT NULL | The access latency rate provided by the selected tier. |
-| `created_at` | TEXT | NOT NULL | Timestamp indicating when the allocation was requested. |
+### 3.6.2 Size and format
+*   **Format:** Relational SQLite Database file (`storage_allocation.db`).
+*   **Tiers Data Size:** 3 tiers, each with properties (Name, Cost/GB, SLA Availability %, Access Latency ms).
+*   **Allocations Data Size:** Generates transaction records of historical simulation runs. The mock generator pre-populates 20 transactions representing various requests spread over 30 days.
+
+### 3.6.3 Preprocessing steps
+Before executing the multi-objective scoring evaluation:
+1.  **Metric Filtering:** Requests are filtered by boolean conditions (SLA availability $\ge$ requested availability, latency $\le$ requested latency).
+2.  **Unavailability Conversion:** The availability percentages (99.0% to 99.999%) are converted to unavailability rates (0.01 to 0.00001) for minimizability.
+3.  **Min-Max Scaling:** Cost and unavailability values are scaled between 0.0 and 1.0 to standardize mathematical dimensions.
 
 ---
 
-## 3.7 Validation and Testing Plan
+## 3.7 Validation or Testing Plan
 
-### 3.7.1 Testing Approach
-The system undergoes dynamic testing during development to verify both functional performance and the mathematical accuracy of the scoring model.
+### 3.7.1 How the system will be tested
+The system is validated dynamically. We supply range boundaries (boundary value analysis) and typical requests (equivalence partitioning) to the recommendation engine to verify that:
+*   It recommends the cheapest tier when $\alpha = 1.0$.
+*   It recommends the most reliable tier when $\alpha = 0.0$.
+*   It logs entries to SQLite correctly.
 
-### 3.7.2 Types of Testing
-*   **Unit Testing:** Individual software functions, such as the mathematical score normalizations and individual baseline selectors (First Fit, Best Fit, Worst Fit) in `heuristic.py`, are verified against manual mathematical calculations.
-*   **Integration Testing:** Verifies the database connection, ensuring that saving an allocation in the UI correctly commits a row to the SQLite database and updates dashboard metrics.
-*   **System Testing:** End-to-end testing of the Streamlit application. This is validated by filling out the allocation form and ensuring that correct recommended tiers and comparative charts render on-screen.
+### 3.7.2 Types of testing
+*   **Unit testing:** Core mathematical calculations and baseline algorithms in `heuristic.py` are isolated and tested using a python test script to verify score outputs.
+*   **Integration testing:** Ensures that database writing routines (`database.py`) and result displays run cooperatively with `heuristic.py`.
+*   **User testing (UI Validation):** Streamlit UI is tested to confirm forms, error dialogs, Plotly charts, and file download mechanisms run correctly.
 
 ---
 
-## 3.8 Ethical and Security Considerations
+## 3.8 Ethical Considerations
 
-*   **Data Privacy:** The application does not collect, store, or transmit any Personal Identifiable Information (PII). All storage demands, logs, and simulated allocations represent corporate client infrastructure metadata.
-*   **Database Security:** Since SQLite is stored locally, data access security is managed by file-system user permissions. The SQLite connection uses parameterized queries during inputs (FR4) to prevent SQL Injection exploits.
+### 3.8.1 Data privacy
+The software uses purely synthetic workload metadata representing infrastructure requests (required size in GB, milliseconds latency, SLA percentage). No personal data, IP addresses, user accounts, or private organization files are processed or stored.
+
+### 3.8.2 Consent (if human data used)
+Because the research is conducted purely using simulated cloud infrastructure metadata and public cloud pricing models, no human subjects are involved. Consequently, ethical consent approvals and human subject forms are not required.
+
+### 3.8.3 Security considerations
+Security is enforced locally by securing the application directory. Parameterized SQLite inputs are used throughout the application code to eliminate the risk of database compromise via SQL Injection attacks.
