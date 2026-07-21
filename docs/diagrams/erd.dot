@@ -1,0 +1,9 @@
+digraph G {
+    rankdir=LR;
+    node [shape=record];
+    
+    storage_tiers [label="{storage_tiers|+ id PK\l+ name\l+ cost_per_gb\l+ sla_availability\l+ access_latency\l}"];
+    allocations [label="{allocations|+ id PK\l+ required_size\l+ availability_req\l+ latency_req\l+ budget\l+ alpha\l+ beta\l+ recommended_tier_id FK\l+ cost_estimate\l+ availability_prediction\l+ latency_prediction\l+ created_at\l}"];
+    
+    storage_tiers -> allocations [label="recommends", arrowhead=crow];
+}

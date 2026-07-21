@@ -1,0 +1,12 @@
+stateDiagram-v2
+    [*] --> InputParameters
+    InputParameters --> FilterTiers : Submit Form
+    FilterTiers --> CheckFeasibility
+    CheckFeasibility --> CalculateScores : Feasible Tiers Found
+    CheckFeasibility --> ShowError : No Feasible Tiers
+    CalculateScores --> SelectOptimal : Minimum Score
+    SelectOptimal --> RunBaselines
+    RunBaselines --> LogToDatabase
+    LogToDatabase --> ShowResult
+    ShowResult --> [*]
+    ShowError --> [*]

@@ -1,0 +1,139 @@
+(Transcribed by TurboScribe. Go Unlimited to remove this message.)
+
+So you have your chapter 3, all written in uppercase, centered, follow the format, and then under that the chapter heading is methodology and system design, all in uppercase, bolded, and then centered. Then you have your brief introduction, it should be similar to what you did in chapter 2. If chapter 2 you have 2.0 as introduction, then chapter 3 you have 3.0 also as introduction. If chapter 2 you gave the introduction without any heading, so after your chapter 2 literature review and then you started giving the introduction without any heading, chapter 3, 2, you come with your chapter heading and then you start with your introduction without any heading, it should be similar. 
+
+And remember, you are going to continue with the same document that you are dealing with. So the document that you have your chapter 1 and then you have your chapter 2 and then you have your references. So where you have your references, just insert a page break so that the references goes down and then you start your chapter 3 on a fresh page.
+
+The references, after your chapter 3, the references will still be there. So take note of that. You are going to work with the same document that you started with. 
+
+The introduction, it should cover briefly what subheadings 3.1 talks about, 3.2 talks about, 3.3 talks about, 3.4 and so forth. Do not add the sub-subheadings. And then when you are done, the 3.1 is the research methodology. 
+
+So the research methodology, there are three things you talk about. The research approach, the data collection method, if you collected data. If you didn't collect any data, just leave that one. 
+
+And then the system development methodology. Your methodology, every methodology, let me put it that way, deals with two W's and one H. Every methodology deals with two W's and one H. The first W is what, the second W is why, and then the H, how. So the research approach, you are giving design science, you are giving experimental, you are giving survey, you are giving case study.
+
+So you have your 3.1 research methodology. And then this research or the research approach applied in this study is the design science. So you've answered the first one, what.
+
+So what, you tell us what you are using, what you are doing, what you are doing. And then the next one, why. So we have experimental, we have survey, we have case study.
+
+But why are you using design science? So the research approach adopted in this study is design science. Although there are other research approaches like experimental, survey, case study. However, design science was adopted because you come up with a reason, that's why.
+
+And in most cases, the why will come up with a reference. In most cases, in fact, almost 98%. Why are you using or why have you chosen design science or any other? You have to read.
+
+So you read about design science, you read about experimental, and then you select. And whatever you select, there is a reason to that. And that reason should come from the literature.
+
+So at the end, you give a reference. If you are developing a system and then you made some interview, whatever, that one will not come under data collection. Those designing models, that one, they did the data collection. 
+
+So what kind of data did they collect and how did they collect the data? Is it through questionnaire or is it through interview? And then they should also at least talk about the method. Was it collected randomly or there was some kind of stratified approach? That means you group and then within that one, probably you selected randomly. So tell us how the data was collected. 
+
+If you're also using data which has already been collected by someone, then here you state the data is from, let's say, Cargo UCI. And then tell us how they collected that data. And then the software development methodology. 
+
+What method did they use? Was it a waterfall? Was it a prototype? Was it incremental building block? Was it agile? And then so forth. And then why? So at any point, the data collection method, you also tell us why and how it was done. So you use random sampling.
+
+Why did you use random sampling? And how did you do it? You prepare a questionnaire and then you give it to the people of KSTU. Or you put it using Google Form and then you send the link to the various groups, WhatsApp groups that you have. Why? That's the how.
+
+So how you collected the data. So the same way if you are using, let's say, waterfall. Waterfall has various phases. 
+
+So in the first place, you tell us why you are using waterfall. Two. So the first one is what? Why? Sorry, what? That's waterfall. 
+
+Two, why? Why did you choose waterfall over the others? And three, how? How waterfall has various phases. Phase one, analysis. So during the analysis phase, what did you do? During the requirement phase, what did you do? During the design phase, so that's the how. 
+
+The next one, which is 3.2, that's the requirement analysis. So with your system, what are the functional requirements? What is your system supposed to do? And what are non-functional requirements? So what did you do to ensure performance, security, usability, et cetera? And if you also dealt with some user requirements, you interviewed some users, then you should also come out with a user requirement and a user stories. If you did not interview any user, then you also tell us here, how did you gather the requirement? How were you able to know that these are the functional requirements? These are the non-functional requirements. 
+
+How did you get them? You should also let us know. And then 3.3, that will be the tools and the technologies used. So programming languages, you decided to work with Python. 
+
+Why Python, not Java? So what does Python? Why Python? And then how? What are the libraries that you use? And what are the versions of those libraries? So programming language, frameworks, and then database. The database design should also come in. And then the development tools. 
+
+You chose Python, but did you use Google Colab or did you use probably Jupyter from Anaconda or PyCharm or whatever? So that's the two. And why did you decide to use that one? And then next, that's 3.4. That will be the system design. In fact, under any of them, you can come out with sub-sessions. 
+
+So for example, the tools and the technologies used, that would be 3.3. And then you have 3.31 programming languages, 3.32 frameworks. That one is up to you. But I can just have 3.4 and then you handled everything under that. 
+
+So how to get a sub-sub heading, that one is up to you. The system design, that's the 3.4, where you talk about the system architecture diagram. More or less, this is like a conceptual framework. 
+
+You divide your system into components and how each component interacts with another. Those designing models too, they also need to do the same thing. So more or less, you look at this as a conceptual framework. 
+
+And then you come out with use cases, how users are going to interact with the system. And they also come out with a database design. Then 3.3, where it talks about tools and technologies used. 
+
+The database system you mentioned, you use MySQL, you use Postgrid, you use Oracle DB or whatever. So why did you use that? But when you come to 3.4, under the database design, that's where you have the entity relations diagram. If there's no database in your work, then you just ignore. 
+
+And then you choose either two or three of the following. Either active diagram, sequence diagram, class diagram, input design, or output design. In addition to the above, that's the system architecture, the use case diagram, the database design. 
+
+If you deal with database, you come down, you either add two or three. It shouldn't be more than three in addition to the top there, so that you have your system design. And then you move to 3.5, algorithms or model description, or pseudocode or flowchart. 
+
+So if you are dealing with a model, then just select model description 3.5. That's where you describe the model. And the model that you are working with, either you are dealing with a random forest or whatever, you describe the model. And if you can come out with some mathematical formulas underpinning the model, that one is also accepted. 
+
+And if you can also come out with a diagram of the model, that's fine. If you are not dealing with model, but strictly system development, like those from the HNA group, then here you have your pseudocode and their flowchart. So you can just make algorithm development, and then have your pseudocode and their flowchart. 
+
+Even those with the model, after describing the model, you can also come up with their flowchart and algorithm as well. That goes on into the code. Either the pseudocode or the flowchart.
+
+But those developing purely as a system or application algorithm development, you come up with a pseudocode and or flowchart. You can come up with both or you choose one. That one is up to you. 
+
+And then the next one, that's 3.6. Those dealing with the model data description or data set. So here we talk about the format of the data set, how many columns, how many attributes, how many records, the number of records, and what are the data types of the various records. And if you did any pre-processing task, that one should also come here. 
+
+You check for missing values. You also check for less outliers. You also check for whether the data is skewed. 
+
+And then you also apply normalization. So all of them will come under the pre-processing steps. So 3.1, that's the research methodology. 
+
+3.2, that's the requirement analysis. 3.3, tools and the technologies used. 3.4, system design. 
+
+3.5, algorithm development or model description. And then 3.6, for those dealing with model data description. And 3.7, where you have the validation and testing plan. 
+
+If you're only doing system work, then that becomes your 3.6. Validation and then texting plan. So how the system will be texted. You talk about the unit testing, you talk about the integration testing, and then the user testing. 
+
+How you do that. So here we are not dealing with definitions. Don't tell us what unit testing means. 
+
+No. If you are going to do unit testing, how are you going to do it? So your program is divided into units. You have the administrative, you have whatever, the client side, and even there you have designed the various modules. 
+
+So you are testing the various modules. Mention the modules. If it's a model development, one goes on into the model development. 
+
+What specific tests are you going to do? Should be specific here. This methodology. So don't define integration testing. 
+
+Don't define unit testing, user testing. No. At the end, if you are going to use users to test, how many are you going to use? And why are you going to use them to test the system? And if there is a tie from whatever they say during testing, how are you going to break that tie? And those who deal with data collection, you also go ahead and then finish with the ethical consideration. 
+
+The data that you collected, you took into consideration data privacy. You ensure that their consent was sought before collecting the data. And there are some security considerations. 
+
+Their consent only applies when you are dealing with humans. If there's a simulation that you're dealing with, you don't need a consent there. So basically, this is what you are going to do.
+
+So this constitutes your methodology. Methodology, that's your chapter three. If you have any questions, you can ask. 
+
+Ask all your questions. Hello, Prof. Good evening. Hello. 
+
+Prof, I wanted to ask about those of us whose projects deal mostly with simulation. When it comes to their questionnaire and the gathering the information, how are we going to go about it and it's not going to be used by like typical users and users? Did you design any questionnaire? Not yet, sir. Are you going to design it? That is why I'm asking you.
+
+If only you only write about it when you use it. Okay. If you didn't use it, then just skip it. 
+
+You leave it out. Please, I urge all of you to just play it back again before you finally present the work. So just watch it again before you do your work and then present.
+
+Let me answer this call. Okay. Any question? So the sessions, if you didn't do it, if it's not part of your work, just leave it out. 
+
+Remember the system design, the first phrase, system architecture, which is the conceptual framework. The use case, the database design will come and they select either two or three. They need to, that's from activity diagram, sequence diagram, class diagram, input diagram, and then output diagram. 
+
+And you are continuing from the document that you submitted so far, the one that contains your chapter one, the one that contains your chapter one and two. Where you have the references, you move that one down using the insert page break. You go to insert, you choose, you place the case behind the work, behind the reference.
+
+That's what comes first. That's the reference. So at the back of R, and then you go to insert at the left side, you see page break, and then you click on it.
+
+And that will move the reference to the next page, leaving that page blank. And then you have your chapter three, three in words, chapter boarded, centered, uppercase. Under that one, methodology and then system design. 
+
+And then based on the format that you work with in your chapter two, whether you had 2.0 as introduction, then here you have 3.0 as introduction. You talk about each subheading briefly, 3.1, 3.2, 3.3, 3.4, 3.5, and so forth. And then you go to your 3.1 and then you continue. 
+
+The formatting should be the same. Don't let me prompt you because of formatting. Because you already have the document times neuroman 1.5, alignment justified. 
+
+Do it, format it nicely before you submit. I'm not dealing with any screen. You have the information already on the page and that's what we are discussing.
+
+Any other question? Okay. So if there's no question, we can end here. And then after that, share the recordings and then play a listing again because it's about just 25 or so minutes.
+
+If you didn't make notes, you plug in and then you make note from it and then use it to design or write your document. But our advice that you should at least ensure that you have about 80% true with your system. Because it's based on the system that you use to design your methodology.
+
+Because those, if you are dealing with the model, so the model, did you perform a hyper parameter tuning? You have to, if you did it, then you now can state it during the model development. And how did you go about it? Did you choose either random or grid? What was the range of the learning parameter? That's the learning rate and so forth. So all this, at least you should have developed your system to about 80% and then use that one to write the methodology. 
+
+So please take notes. Because you've developed the system, you have to give the flowchart or the pseudocode. But you're now going to develop the system. 
+
+So how did you get a pseudocode or flowchart? And remember, once you present, after going through, you'll be called upon to present the system so that I check the system with what you've presented. And then your chapter four, where you talk about the results and then the system implementation and testing, that one too should also reflect your chapter three, the methodology. Because certain things you've mentioned in your methodology should appear in the results. 
+
+So please take note of that. The three and four, they move together. So in most cases, you may even ask to produce three and four simultaneously.
+
+But now you just produce three after completing 80% so that if there's anything that you want to change, it shouldn't be much. Okay, I guess we can end here. Eunice, I hope I can close.
+
+Yes, please, you can close. So thank you all for coming. Thank you.
+
+(This file is longer than 30 minutes. Go Unlimited at https://turboscribe.ai/ to transcribe files up to 10 hours long.)

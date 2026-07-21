@@ -1,0 +1,28 @@
+digraph G {
+    rankdir=TB;
+    node [shape=box];
+    
+    start [label="*", shape=circle];
+    Input [label="InputParameters"];
+    Filter [label="FilterTiers"];
+    Check [label="CheckFeasibility"];
+    Calc [label="CalculateScores"];
+    Select [label="SelectOptimal"];
+    Baselines [label="RunBaselines"];
+    Log [label="LogToDatabase"];
+    Show [label="ShowResult"];
+    Error [label="ShowError"];
+    end [label="*", shape=circle];
+    
+    start -> Input;
+    Input -> Filter [label="Submit Form"];
+    Filter -> Check;
+    Check -> Calc [label="Feasible Tiers Found"];
+    Check -> Error [label="No Feasible Tiers"];
+    Calc -> Select [label="Minimum Score"];
+    Select -> Baselines;
+    Baselines -> Log;
+    Log -> Show;
+    Show -> end;
+    Error -> end;
+}

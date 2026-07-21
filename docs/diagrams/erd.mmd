@@ -1,0 +1,23 @@
+erDiagram
+    storage_tiers {
+        int id PK
+        varchar name
+        real cost_per_gb
+        real sla_availability
+        real access_latency
+    }
+    allocations {
+        int id PK
+        real required_size
+        real availability_req
+        real latency_req
+        real budget
+        real alpha
+        real beta
+        int recommended_tier_id FK
+        real cost_estimate
+        real availability_prediction
+        real latency_prediction
+        varchar created_at
+    }
+    storage_tiers ||--o{ allocations : "recommends"
