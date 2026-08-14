@@ -118,6 +118,26 @@ Follow these steps depending on your preferred Windows command-line environment:
 
 ---
 
+### ✅ One-Command Windows Startup
+
+From the project root, run:
+```cmd
+start.bat
+```
+
+This script will:
+- create and activate the `.venv`
+- install dependencies
+- seed mock data unless you pass `skip-mock`
+- launch the app with Streamlit
+
+To run without mock data seeding:
+```cmd
+start.bat skip-mock
+```
+
+---
+
 ### 🐧 🍎 Linux / macOS Setup Instructions
 
 1. Navigate to the project directory:
