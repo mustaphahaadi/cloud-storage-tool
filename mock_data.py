@@ -6,28 +6,24 @@ from datetime import datetime, timedelta
 def generate_mock_data():
     database.init_db()
     
-    # We will generate 20 random allocations spread over the last 30 days
     now = datetime.now()
     
-    for _ in range(20):
-        # Random inputs
-        req_size = random.choice([50, 100, 500, 1000, 2000, 5000])
-        latency = random.choice([5.0, 15.0, 60.0])
+    # Generate 100 realistic allocations spread over the last 30 days
+    for _ in range(100):
+        req_size = random.choice([100, 250, 500, 750, 1000, 1500, 2500, 5000])
+        latency = random.choice([5.0, 10.0, 15.0, 30.0, 60.0])
         availability = random.choice([99.0, 99.9, 99.99, 99.999])
-        budget = random.choice([0, 50, 100, 500]) # 0 means no budget
+        budget = random.choice([0, 0, 100, 250, 500]) # 0 means no budget
         
-        # Select random alpha/beta combination
-        alpha = random.choice([0.1, 0.3, 0.5, 0.7, 0.9])
-        beta = round(1.0 - alpha, 1)
+        alpha = random.choice([0.2, 0.4, 0.5, 0.6, 0.8])
+        beta = round(1.0 - alpha, 2)
         
         result = heuristic.allocate_storage(req_size, availability, latency, budget if budget > 0 else None, alpha=alpha, beta=beta)
         
         if result["success"]:
-            # Random date within last 30 days
             days_ago = random.randint(1, 30)
-            created_at = now - timedelta(days=days_ago)
+            created_at = now - timedelta(days=days_ago, hours=random.randint(0, 23), minutes=random.randint(0, 59))
             
-            # Save manually to override created_at
             conn = database.get_connection()
             cursor = conn.cursor()
             cursor.execute("""
@@ -41,4 +37,4 @@ def generate_mock_data():
 
 if __name__ == "__main__":
     generate_mock_data()
-    print("Mock data generated.")
+    print("100 mock allocations seeded into database.")

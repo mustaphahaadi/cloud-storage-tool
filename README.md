@@ -156,6 +156,18 @@ start.bat skip-mock
    pip install -r requirements.txt
    ```
 
+### ✅ One-Command Linux / macOS Startup
+
+From the project root, run:
+```bash
+./start.sh
+```
+
+To run without mock data seeding:
+```bash
+./start.sh skip-mock
+```
+
 ---
 
 ## Running the Application

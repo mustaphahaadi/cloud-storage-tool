@@ -132,20 +132,40 @@ def append_markdown_to_doc(md_filepath, doc):
             if os.path.exists(img_path):
                 p_img = doc.add_paragraph()
                 p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                p_img.paragraph_format.space_before = Pt(12)
+                p_img.paragraph_format.space_before = Pt(14)
                 p_img.paragraph_format.space_after = Pt(4)
+                p_img.paragraph_format.keep_with_next = True
                 run = p_img.add_run()
-                run.add_picture(img_path, width=Inches(6.0))
+                run.add_picture(img_path, width=Inches(6.2))
 
                 p_cap = doc.add_paragraph()
                 p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
                 p_cap.paragraph_format.space_before = Pt(2)
-                p_cap.paragraph_format.space_after = Pt(12)
-                run_cap = p_cap.add_run(caption)
-                run_cap.font.name = 'Times New Roman'
-                run_cap.font.size = Pt(10)
-                run_cap.font.italic = True
-                run_cap.font.color.rgb = RGBColor(71, 85, 105)
+                p_cap.paragraph_format.space_after = Pt(14)
+                
+                # Format "Figure X.Y:" as Bold Times New Roman and description text as Italic
+                fig_prefix_match = re.match(r'^(Figure\s+\d+\.\d+:?\s*)(.*)$', caption, re.IGNORECASE)
+                if fig_prefix_match:
+                    prefix = fig_prefix_match.group(1)
+                    rest = fig_prefix_match.group(2)
+                    
+                    run_pre = p_cap.add_run(prefix)
+                    run_pre.font.name = 'Times New Roman'
+                    run_pre.font.size = Pt(10)
+                    run_pre.font.bold = True
+                    run_pre.font.color.rgb = RGBColor(15, 23, 42)
+                    
+                    run_rest = p_cap.add_run(rest)
+                    run_rest.font.name = 'Times New Roman'
+                    run_rest.font.size = Pt(10)
+                    run_rest.font.italic = True
+                    run_rest.font.color.rgb = RGBColor(51, 65, 85)
+                else:
+                    run_cap = p_cap.add_run(caption)
+                    run_cap.font.name = 'Times New Roman'
+                    run_cap.font.size = Pt(10)
+                    run_cap.font.italic = True
+                    run_cap.font.color.rgb = RGBColor(51, 65, 85)
             continue
 
         # Horizontal Rule

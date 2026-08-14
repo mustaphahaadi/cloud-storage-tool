@@ -1,9 +1,9 @@
 # CHAPTER FOUR: SYSTEM IMPLEMENTATION, TESTING AND RESULTS
 
 ## 4.0 Introduction
-This chapter details the software implementation, architecture, interface design, empirical testing procedures, and experimental evaluation for the **Heuristics Approach to Storage Resource Allocation for Cost Reduction and SLA-Aware Availability**. Following the Design Science methodology and dual-objective mathematical formulation established in Chapter Three, this implementation translates multi-objective greedy scoring algorithms, Min-Max normalization, and relational SQLite schema definitions into a production-grade interactive cloud storage optimization platform.
+This chapter details the software implementation, architecture, interface design, empirical testing procedures, and experimental evaluation for the **Heuristics Approach to Storage Resource Allocation for Cost Reduction and SLA-Aware Availability**. Following the Design Science methodology and dual-objective mathematical formulation established in Chapter Three, this implementation translates multi-objective greedy scoring algorithms, Min-Max normalization, automated workload storage estimation models, and relational SQLite schema definitions into a production-grade interactive cloud storage optimization platform.
 
-The system provides a real-time web-based simulation environment that enables cloud infrastructure administrators to optimize cloud storage tier allocation (Block, File, Object) against strict Service Level Agreement (SLA) availability constraints and max access latency thresholds while minimizing total operational expenditures.
+The system provides a real-time web-based simulation environment that enables cloud infrastructure administrators to optimize cloud storage tier allocation (Block, File, Object) against strict Service Level Agreement (SLA) availability constraints and max access latency thresholds while minimizing total operational expenditures. Furthermore, the platform features an **Automatic Storage Size Suggestion Engine** that calculates required storage capacity based on enterprise workload profiles.
 
 ---
 
@@ -31,10 +31,10 @@ The application architecture adheres to strict modular separation of concerns. T
 cloud-optimized/
 ├── app.py                   # Main Controller & Navigation Router
 ├── database.py              # SQLite Data Access Layer & Relational Schema
-├── heuristic.py             # Heuristic Algorithm & Baseline Engine
+├── heuristic.py             # Heuristic Algorithm, Baseline Engine & Workload Estimator
 ├── mock_data.py             # Workload Benchmark Generator Utility
 └── modules/
-    ├── allocation.py        # Interactive Storage Allocation & Baseline View
+    ├── allocation.py        # Interactive Storage Allocation & Auto-Suggest View
     ├── dashboard.py         # Executive System KPI & Analytics View
     ├── monitoring.py        # Tier SLA & Latency Compliance Monitor
     └── reporting.py         # Historical Allocation Logger & CSV Exporter
@@ -43,23 +43,22 @@ cloud-optimized/
 ### 4.2.1 Core Routing Controller (`app.py`)
 `app.py` serves as the primary system entry point. It initializes the SQLite database schema on startup, configures the Streamlit wide-layout page metadata, constructs the navigation sidebar, and dynamically routes execution to the selected module view based on user input.
 
-### 4.2.2 Dual-Objective Heuristic Scoring Engine (`heuristic.py`)
-`heuristic.py` implements the core algorithm developed in Chapter Three. It evaluates candidate cloud storage tiers against hard constraints (minimum SLA availability % and maximum access latency ms). For eligible candidate tiers, it computes total estimated cost ($C$) and unavailability ($U = 1.0 - \text{SLA}/100$). It normalizes $C$ and $U$ using Min-Max scaling across candidate tier bounds, evaluates the weighted objective score ($\text{Score} = \alpha \cdot C_{\text{norm}} + \beta \cdot U_{\text{norm}}$), and selects the tier that minimizes this score. Additionally, `heuristic.py` implements First Fit (FF), Best Fit (BF), and Worst Fit (WF) baseline allocation routines for comparative performance benchmarking.
+### 4.2.2 Dual-Objective Heuristic Engine & Auto-Suggest Module (`heuristic.py`)
+`heuristic.py` implements both the workload estimation model and the core allocation algorithm developed in Chapter Three:
+1. **Automated Storage Sizing Engine (`suggest_workload_size`)**: Calculates recommended storage size ($S_{\text{req}}$ in GB) based on operational parameters across five enterprise workload profiles:
+   - **Enterprise Relational DB (OLTP)**: $S_{\text{req}} = 20.0 + (U \times 0.05) + (T \times 0.0001)$
+   - **HD Video Streaming**: $S_{\text{req}} = A \times \text{Size\_Per\_Asset}$
+   - **IoT Sensor & Log Analytics**: $S_{\text{req}} = (D \times L \times P) / 1024$
+   - **Document CMS**: $S_{\text{req}} = (E \times \text{Docs\_Per\_Emp} \times \text{Doc\_Size\_MB}) / 1024$
+   - **Cold Backup Archive**: $S_{\text{req}} = \text{Snapshot\_Size\_GB} \times \text{Retention\_Count}$
+
+2. **Multi-Objective Scoring Engine (`allocate_storage`)**: Evaluates candidate storage tiers against hard constraints (minimum SLA availability % and maximum access latency ms). For eligible tiers, it computes total estimated cost ($C$) and unavailability ($U = 1.0 - \text{SLA}/100$). It normalizes $C$ and $U$ using Min-Max scaling across candidate tier bounds, evaluates the weighted objective score ($\text{Score} = \alpha \cdot C_{\text{norm}} + \beta \cdot U_{\text{norm}}$), and selects the tier that minimizes this score. It also executes First Fit (FF), Best Fit (BF), and Worst Fit (WF) baseline routines for comparative performance benchmarking.
 
 ### 4.2.3 Data Access Layer (`database.py`)
 `database.py` manages SQLite connection pooling, schema provisioning, default storage tier seeding, and transaction log persistence. All SQL queries use parameterized arguments (`?`) to prevent SQL injection vulnerabilities and maintain database integrity.
 
-### 4.2.4 Interactive Allocation Simulation Module (`modules/allocation.py`)
-Provides input controls (numerical fields and sliders) allowing users to specify workload parameters (required size GB, availability SLA %, max latency ms, budget $, and trade-off weights $\alpha, \beta$). Upon submission, it executes the heuristic algorithm alongside baseline algorithms and renders a comparative analysis table.
-
-### 4.2.5 Executive Dashboard Module (`modules/dashboard.py`)
-Calculates system-wide Key Performance Indicators (KPIs) from historical allocation logs stored in SQLite, rendering summary metric cards and Plotly distribution charts for storage tier utilization and spend.
-
-### 4.2.6 Performance Monitoring Module (`modules/monitoring.py`)
-Displays real-time technical specifications for available cloud storage tiers (Block, File, Object), including unit pricing per GB, SLA availability guarantees, and access latency bounds.
-
-### 4.2.7 Reporting & Audit Module (`modules/reporting.py`)
-Presents a data table of historical storage resource allocation records with multi-column filtering, timestamp sorting, and a one-click CSV export utility.
+### 4.2.4 Interactive Allocation Simulation View (`modules/allocation.py`)
+Combines the Automatic Storage Size Suggestion Engine interface with constraint input controls. Users select workload categories and adjust scale parameters to auto-fill the required storage size field before submitting for dual-objective heuristic evaluation and baseline comparative rendering.
 
 ---
 
@@ -69,41 +68,60 @@ The user interface is designed as an interactive Streamlit web application divid
 ### 4.3.1 Executive Dashboard Interface
 The Executive Dashboard presents top-level KPI metric cards—Total Allocation Requests, Total Allocated Volume (GB), Total Estimated Spend ($), and Average SLA Availability (%). It renders interactive Plotly charts showing allocation distributions across candidate tiers.
 
-![Figure 4.1: Streamlit Executive Dashboard View](file:///home/haadi/Desktop/project-work/Eunice-Btech/cloud-optimized/docs/images/fig_4_1_dashboard.png)  
-*Figure 4.1: Streamlit Executive Dashboard View displaying system KPI metric cards and Plotly distribution charts.*
+![Figure 4.1: Streamlit Executive Dashboard View displaying system KPI metric cards and Plotly distribution charts](file:///home/haadi/Desktop/project-work/Eunice-Btech/cloud-optimized/docs/images/fig_4_1_dashboard.png)
 
 ---
 
-### 4.3.2 Allocation Simulation & Baseline Trade-Off Interface
-The Allocation Simulation screen features interactive controls for specifying storage volume requirements, SLA availability constraints, latency limits, budget ceilings, and the $\alpha/\beta$ cost-versus-availability weight slider. Upon calculation, it displays the recommended tier alongside a comparative evaluation against First Fit, Best Fit, and Worst Fit baseline policies.
+### 4.3.2 Allocation Simulation & Automatic Storage Sizing Interface
+The Allocation Simulation screen features the **Automatic Storage Size Suggestion Engine** at the top, allowing users to select enterprise workload categories (e.g., IoT Log Analytics, Relational DB) and scale parameters (devices, retention days, log rates). The calculated recommendation automatically populates the storage size field. Users adjust SLA constraints, latency limits, budget ceilings, and the $\alpha/\beta$ weight slider before running the multi-objective heuristic and baseline comparisons.
 
-![Figure 4.2: Storage Resource Allocation Simulation & Trade-Off View](file:///home/haadi/Desktop/project-work/Eunice-Btech/cloud-optimized/docs/images/fig_4_2_allocation.png)  
-*Figure 4.2: Storage Resource Allocation Simulation & Trade-Off View with interactive parameter controls and comparative baseline output.*
+![Figure 4.2: Storage Resource Allocation Simulation View showing the Automatic Storage Size Suggestion Engine and baseline comparative results](file:///home/haadi/Desktop/project-work/Eunice-Btech/cloud-optimized/docs/images/fig_4_2_allocation.png)
 
 ---
 
 ### 4.3.3 Performance Monitoring Interface
 The Performance Monitoring screen presents real-time storage tier metrics, unit pricing per GB ($0.15 for Block, $0.08 for File, $0.02 for Object), SLA availability ratings (99.999%, 99.99%, 99.0%), and latency thresholds (2.0 ms, 10.0 ms, 50.0 ms).
 
-![Figure 4.3: Tier Performance Monitoring & SLA Compliance View](file:///home/haadi/Desktop/project-work/Eunice-Btech/cloud-optimized/docs/images/fig_4_3_monitoring.png)  
-*Figure 4.3: Tier Performance Monitoring & SLA Compliance View showing storage tier specifications and SLA constraints.*
+![Figure 4.3: Tier Performance Monitoring & SLA Compliance View showing storage tier specifications and SLA constraints](file:///home/haadi/Desktop/project-work/Eunice-Btech/cloud-optimized/docs/images/fig_4_3_monitoring.png)
 
 ---
 
 ### 4.3.4 Reporting & Audit Log Interface
 The Reporting & Evaluation screen displays an audit log table of historical allocations retrieved from SQLite, equipped with data summary cards and a CSV export mechanism.
 
-![Figure 4.4: Allocation Reporting & Log Analytics View](file:///home/haadi/Desktop/project-work/Eunice-Btech/cloud-optimized/docs/images/fig_4_4_reporting.png)  
-*Figure 4.4: Allocation Reporting & Log Analytics View showing historical allocation logs and CSV export control.*
+![Figure 4.4: Allocation Reporting & Log Analytics View showing historical allocation logs and CSV export control](file:///home/haadi/Desktop/project-work/Eunice-Btech/cloud-optimized/docs/images/fig_4_4_reporting.png)
 
 ---
 
 ## 4.4 Code Walkthroughs & Technical Explanation
 
-### Code Walkthrough 4.1: Multi-Objective Min-Max Scoring Algorithm (`heuristic.py`)
-The `allocate_storage` function implements the core scoring model. Hard constraints filter out non-compliant tiers, followed by total cost evaluation, budget validation, Min-Max normalization, and weighted score minimization:
+### Code Walkthrough 4.1: Workload Auto-Suggest Engine & Min-Max Scoring (`heuristic.py`)
+Demonstrates automated workload profile size calculation and multi-objective scoring logic:
 
 ```python
+def suggest_workload_size(workload_category, params):
+    """
+    Automatically calculates suggested storage capacity (in GB) based on workload profiles.
+    """
+    if workload_category == "Enterprise Relational Database (OLTP)":
+        users = params.get("users", 1000)
+        transactions = params.get("transactions", 50000)
+        return round(20.0 + (users * 0.05) + (transactions * 0.0001), 2)
+        
+    elif workload_category == "IoT Sensor & Log Analytics":
+        devices = params.get("devices", 500)
+        daily_log_mb = params.get("daily_log_mb", 50.0)
+        retention_days = params.get("retention_days", 90)
+        total_mb = devices * daily_log_mb * retention_days
+        return round(total_mb / 1024.0, 2)
+        
+    elif workload_category == "Cold Backup & System Archive":
+        snapshot_gb = params.get("snapshot_gb", 500.0)
+        retention_count = params.get("retention_count", 6)
+        return round(snapshot_gb * retention_count, 2)
+        
+    return 100.0
+
 def allocate_storage(required_size, availability_req, latency_req, budget=None, alpha=0.5, beta=0.5):
     tiers_df = get_storage_tiers()
     
@@ -119,17 +137,6 @@ def allocate_storage(required_size, availability_req, latency_req, budget=None, 
     # Cost calculation phase
     eligible_tiers['total_cost'] = eligible_tiers['cost_per_gb'] * required_size
     
-    # Budget constraint enforcement
-    if budget is not None and budget > 0:
-        budget_eligible = eligible_tiers[eligible_tiers['total_cost'] <= budget]
-        if budget_eligible.empty:
-            min_cost_tier = eligible_tiers.loc[eligible_tiers['total_cost'].idxmin()]
-            return {
-                "success": False,
-                "message": f"No tier meets requirements within budget. Closest option: {min_cost_tier['name']} at ${min_cost_tier['total_cost']:.2f}"
-            }
-        eligible_tiers = budget_eligible.copy()
-        
     # Min-Max Normalization phase
     eligible_tiers['unavailability'] = 1.0 - (eligible_tiers['sla_availability'] / 100.0)
     
@@ -139,7 +146,6 @@ def allocate_storage(required_size, availability_req, latency_req, budget=None, 
     cost_range = max_cost - min_cost
     unavail_range = max_unavail - min_unavail
     
-    # Weighted score calculation
     scores = []
     for idx, row in eligible_tiers.iterrows():
         c_norm = (row['total_cost'] - min_cost) / cost_range if cost_range > 0 else 0.0
@@ -155,80 +161,42 @@ def allocate_storage(required_size, availability_req, latency_req, budget=None, 
         "tier_name": best_tier['name'],
         "cost_estimate": float(best_tier['total_cost']),
         "availability_prediction": float(best_tier['sla_availability']),
-        "latency_prediction": float(best_tier['access_latency']),
-        "score": float(best_tier['score'])
+        "latency_prediction": float(best_tier['access_latency'])
     }
 ```
 
 ---
 
-### Code Walkthrough 4.2: Streamlit Interactive Allocation & Baseline Controller (`modules/allocation.py`)
-This module captures user form parameters, executes both the heuristic optimization and baseline algorithms, logs successful allocations to SQLite, and renders the baseline comparison table:
+### Code Walkthrough 4.2: Streamlit Interactive Auto-Suggest & Simulation Module (`modules/allocation.py`)
+This module renders the workload profile parameter selector, computes the automated storage size suggestion, populates the input form, and renders baseline comparative results:
 
 ```python
-def app():
-    st.title("⚡ Storage Resource Allocation Simulation")
-    
-    with st.form("allocation_form"):
-        col1, col2 = st.columns(2)
-        with col1:
-            req_size = st.number_input("Required Storage Size (GB)", min_value=1.0, value=500.0, step=50.0)
-            availability_req = st.number_input("Minimum Availability SLA (%)", min_value=90.0, max_value=99.999, value=99.9, step=0.01)
-            latency_req = st.number_input("Maximum Access Latency (ms)", min_value=1.0, max_value=100.0, value=20.0, step=1.0)
-        with col2:
-            budget = st.number_input("Max Budget Ceiling ($) (0 = No Limit)", min_value=0.0, value=100.0, step=10.0)
-            alpha = st.slider("Cost Optimization Weight (α)", min_value=0.0, max_value=1.0, value=0.5, step=0.1)
-            beta = round(1.0 - alpha, 2)
-            st.caption(f"Availability Weight (β): {beta}")
-            
-        submitted = st.form_submit_button("Run Allocation Optimizer")
-        
-    if submitted:
-        result = heuristic.allocate_storage(req_size, availability_req, latency_req, budget if budget > 0 else None, alpha, beta)
-        if result["success"]:
-            st.success(f"**Recommended Tier**: {result['tier_name']} | Estimated Cost: **${result['cost_estimate']:.2f}**")
-            database.save_allocation(req_size, availability_req, latency_req, budget if budget > 0 else None,
-                                     alpha, beta, result['tier_id'], result['cost_estimate'],
-                                     result['availability_prediction'], result['latency_prediction'])
-            
-            # Compute baseline comparative benchmarks
-            tiers_df = database.get_storage_tiers()
-            ff = heuristic.allocate_first_fit(tiers_df, req_size, availability_req, latency_req)
-            bf = heuristic.allocate_best_fit(tiers_df, req_size, availability_req, latency_req)
-            wf = heuristic.allocate_worst_fit(tiers_df, req_size, availability_req, latency_req)
-            
-            comp_data = [
-                {"Algorithm": "Proposed Heuristic", "Recommended Tier": result['tier_name'], "Cost ($)": f"${result['cost_estimate']:.2f}", "SLA (%)": f"{result['availability_prediction']}%"},
-                {"Algorithm": "First Fit (FF)", "Recommended Tier": ff['tier_name'], "Cost ($)": f"${ff['cost_estimate']:.2f}", "SLA (%)": f"{ff['availability_prediction']}%"},
-                {"Algorithm": "Best Fit (BF)", "Recommended Tier": bf['tier_name'], "Cost ($)": f"${bf['cost_estimate']:.2f}", "SLA (%)": f"{bf['availability_prediction']}%"},
-                {"Algorithm": "Worst Fit (WF)", "Recommended Tier": wf['tier_name'], "Cost ($)": f"${wf['cost_estimate']:.2f}", "SLA (%)": f"{wf['availability_prediction']}%"}
-            ]
-            st.table(pd.DataFrame(comp_data))
-```
+category = st.selectbox("Select Workload Profile Category", options=[
+    "Enterprise Relational Database (OLTP)",
+    "HD Video & Media Streaming",
+    "IoT Sensor & Log Analytics",
+    "Document & Content Management (CMS)",
+    "Cold Backup & System Archive"
+])
 
----
+# Capture scale parameters based on workload selection
+params = {}
+if category == "IoT Sensor & Log Analytics":
+    params["devices"] = st.number_input("Connected IoT Devices", value=750)
+    params["daily_log_mb"] = st.number_input("Daily Log Output (MB)", value=40.0)
+    params["retention_days"] = st.number_input("Retention Period (Days)", value=120)
 
-### Code Walkthrough 4.3: SQLite Parameterized Data Access Layer (`database.py`)
-Demonstrates secure data initialization and transaction logging using parameterized SQL bindings:
+suggested_gb = heuristic.suggest_workload_size(category, params)
+st.info(f"💡 **Automated Storage Recommendation**: **{suggested_gb:,.2f} GB** calculated for **{category}**.")
 
-```python
-def save_allocation(required_size, availability_req, latency_req, budget, alpha, beta, tier_id, cost_estimate, availability_prediction, latency_prediction):
-    conn = get_connection()
-    cursor = conn.cursor()
-    created_at = datetime.now().isoformat()
-    cursor.execute("""
-        INSERT INTO allocations 
-        (required_size, availability_req, latency_req, budget, alpha, beta, recommended_tier_id, cost_estimate, availability_prediction, latency_prediction, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (required_size, availability_req, latency_req, budget, alpha, beta, tier_id, cost_estimate, availability_prediction, latency_prediction, created_at))
-    conn.commit()
-    conn.close()
+# Required storage size field pre-filled with suggested_gb
+required_size = st.number_input("Required Storage Size (GB)", value=float(suggested_gb))
 ```
 
 ---
 
 ## 4.5 Test Plan and Execution
-The system underwent rigorous empirical testing covering algorithmic logic, constraint filtering, budget enforcement, database persistence, baseline comparisons, and edge-case handling.
+The system underwent empirical testing covering algorithmic logic, constraint filtering, workload estimation formulas, budget enforcement, database persistence, baseline comparisons, and edge-case handling.
 
 ### Table 4.2: System Test Cases and Execution Results
 | Test ID | Target Module / Function | Test Case Description | Expected Output | Actual Output | Status |
@@ -243,6 +211,8 @@ The system underwent rigorous empirical testing covering algorithmic logic, cons
 | **TC-08** | CSV Export Utility | Trigger CSV download button in Reporting Module | Export complete allocation history dataframe as downloadable CSV file | CSV file generated & downloaded successfully | **PASS** |
 | **TC-09** | UI Parameter Boundaries | Input negative storage volume (-50 GB) or SLA > 100% | Streamlit numeric validation blocks submission | Input validation error shown; submission blocked | **PASS** |
 | **TC-10** | Concurrency Test | Execute 500 benchmark allocation requests concurrently | Process all requests under 5ms mean latency without DB lock errors | 500 allocations logged cleanly (mean latency 2.8ms) | **PASS** |
+| **TC-11** | Auto-Suggest Engine | Calculate storage size for 750 IoT devices, 40MB/day, 120 days retention | $S_{\text{req}} = (750 \times 40 \times 120)/1024 = 3,515.62\text{ GB}$ | Auto-calculated 3,515.62 GB correctly | **PASS** |
+| **TC-12** | Auto-Suggest Engine | Calculate storage size for OLTP DB with 2,500 users & 150,000 transactions | $S_{\text{req}} = 20.0 + (2500 \times 0.05) + (150000 \times 0.0001) = 160.00\text{ GB}$ | Auto-calculated 160.00 GB correctly | **PASS** |
 
 ---
 
@@ -278,10 +248,6 @@ Table 4.4 illustrates parameter sensitivity when varying the cost weight $\alpha
 | **0.8** | **0.2** | Cost-Leaning Hybrid | $48.20 | 99.250% | File / Object Storage Mix |
 | **1.0** | **0.0** | Pure Cost Minimization | $44.99 | 99.110% | Object Storage (Lowest Cost) |
 
-#### Sensitivity Takeaways:
-- Setting $\alpha = 0.5$ provides the ideal sweet spot for balanced multi-tenant enterprise workloads, yielding significant cost reductions while maintaining high availability (99.924%).
-- Setting $\alpha = 1.0$ achieves maximum financial savings (mean cost $44.99), making it suitable for cold data archiving workloads where lower availability (99.11%) is acceptable.
-
 ---
 
 ## 4.7 Objective Verification Matrix
@@ -292,13 +258,14 @@ Table 4.5 maps the implemented system features back to the project objectives fo
 | :--- | :--- | :---: |
 | **1. Literature Review & Gap Analysis** | Chapter 2 survey identifying deficiencies in static First Fit, Best Fit, and Worst Fit algorithms. | **FULLY ACHIEVED** |
 | **2. Dual-Objective Scoring Model** | Implemented weighted Min-Max scoring algorithm in `heuristic.py`. | **FULLY ACHIEVED** |
-| **3. Interactive Web Application** | Streamlit single-page application (`app.py`, `modules/`) with real-time baseline evaluation. | **FULLY ACHIEVED** |
-| **4. Database Persistence & Audit Logging** | SQLite database schema with parameterized transaction logging in `database.py`. | **FULLY ACHIEVED** |
-| **5. Empirical Performance Benchmark** | Executed 500-request workload benchmark demonstrating **17.81% cost savings** and **0% SLA violations**. | **FULLY ACHIEVED** |
+| **3. Automated Workload Storage Estimation** | Implemented Workload Profile Auto-Suggest Engine in `heuristic.py` & `modules/allocation.py`. | **FULLY ACHIEVED** |
+| **4. Interactive Web Application** | Streamlit single-page application (`app.py`, `modules/`) with real-time baseline evaluation. | **FULLY ACHIEVED** |
+| **5. Database Persistence & Audit Logging** | SQLite database schema with parameterized transaction logging in `database.py`. | **FULLY ACHIEVED** |
+| **6. Empirical Performance Benchmark** | Executed 500-request workload benchmark demonstrating **17.81% cost savings** and **0% SLA violations**. | **FULLY ACHIEVED** |
 
 ---
 
 ## 4.8 Chapter Summary
-This chapter documented the system implementation, software architecture, user interface design, test execution matrix, and empirical benchmark results for the cloud storage allocation optimization platform. The dual-objective heuristic engine, backed by Streamlit UI components and SQLite persistence, was successfully implemented and empirically validated. The system demonstrated a **17.81% cost reduction** compared to traditional static allocation policies while maintaining **100% SLA availability compliance** across 500 workload requests.
+This chapter documented the system implementation, software architecture, user interface design, test execution matrix, and empirical benchmark results for the cloud storage allocation optimization platform. The dual-objective heuristic engine, supported by the Automatic Storage Size Suggestion Engine, Streamlit UI components, and SQLite persistence, was successfully implemented and empirically validated. The system demonstrated a **17.81% cost reduction** compared to traditional static allocation policies while maintaining **100% SLA availability compliance** across 500 workload requests.
 
 The next chapter (Chapter Five) presents the discussion of findings, theoretical conclusions, project limitations, contributions, and practical recommendations for future research.
