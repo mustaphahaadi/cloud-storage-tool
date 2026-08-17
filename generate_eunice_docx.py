@@ -300,6 +300,39 @@ def parse_markdown_to_docx(md_filepath, docx_filepath):
     doc.save(docx_filepath)
     print(f"Successfully generated Word Document at {docx_filepath}")
 
+def generate_combined_chapter_4_and_5():
+    docs_dir = os.path.join(os.path.dirname(__file__), 'docs')
+    ch4_md = os.path.join(docs_dir, 'Chapter_4_System_Implementation_Testing.md')
+    ch5_md = os.path.join(docs_dir, 'Chapter_5_Discussion_Conclusion_Recom.md')
+    combined_docx = os.path.join(docs_dir, 'Chapter_4_and_5_Eunice.docx')
+    combined_md = os.path.join(docs_dir, 'Chapter_4_and_5_Eunice.md')
+
+    # 1. Create combined Markdown file
+    with open(ch4_md, 'r', encoding='utf-8') as f4:
+        content4 = f4.read()
+    with open(ch5_md, 'r', encoding='utf-8') as f5:
+        content5 = f5.read()
+
+    combined_markdown = content4 + "\n\n---\n\n" + content5
+    with open(combined_md, 'w', encoding='utf-8') as f_out:
+        f_out.write(combined_markdown)
+    print(f"Successfully generated Combined Markdown file at {combined_md}")
+
+    # 2. Create combined Word Document
+    doc = docx.Document()
+    for s in doc.sections:
+        s.top_margin = Inches(1)
+        s.bottom_margin = Inches(1)
+        s.left_margin = Inches(1)
+        s.right_margin = Inches(1)
+
+    append_markdown_to_doc(ch4_md, doc)
+    doc.add_page_break()
+    append_markdown_to_doc(ch5_md, doc)
+
+    doc.save(combined_docx)
+    print(f"Successfully generated Combined Chapter 4 & 5 Word Document at {combined_docx}")
+
 def generate_full_dissertation():
     docs_dir = os.path.join(os.path.dirname(__file__), 'docs')
     ch123_docx = os.path.join(docs_dir, 'Chap_1_2_3_Eunice.docx')
@@ -330,4 +363,5 @@ if __name__ == "__main__":
 
     parse_markdown_to_docx(ch4_md, ch4_docx)
     parse_markdown_to_docx(ch5_md, ch5_docx)
+    generate_combined_chapter_4_and_5()
     generate_full_dissertation()
