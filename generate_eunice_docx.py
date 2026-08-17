@@ -7,6 +7,48 @@ from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml import OxmlElement, parse_xml
 from docx.oxml.ns import qn, nsdecls
 
+def clean_text_equations(text):
+    """
+    Cleans up any stray LaTeX string artifacts into clean, readable typography.
+    """
+    if not text:
+        return text
+    
+    # Replace LaTeX commands
+    replacements = [
+        (r'\alpha', 'α'),
+        (r'\beta', 'β'),
+        (r'\times', '×'),
+        (r'\cdot', '×'),
+        (r'\rightarrow', '→'),
+        (r'\in', '∈'),
+        (r'\min', 'min'),
+        (r'\max', 'max'),
+        (r'S_{\text{req}}', 'S_req'),
+        (r'C_{\text{norm}}', 'C_norm'),
+        (r'U_{\text{norm}}', 'U_norm'),
+        (r'C_{\text{max}}', 'C_max'),
+        (r'C_{\text{min}}', 'C_min'),
+        (r'U_{\text{max}}', 'U_max'),
+        (r'U_{\text{min}}', 'U_min'),
+        (r'SLA_{\text{req}}', 'SLA_req'),
+        (r'Latency_{\text{req}}', 'Latency_req'),
+        (r'\text{req}', 'req'),
+        (r'\text{norm}', 'norm'),
+        (r'\text{max}', 'max'),
+        (r'\text{min}', 'min'),
+    ]
+    
+    for old, new in replacements:
+        text = text.replace(old, new)
+        
+    # Clean up any \text{...} wrappers
+    text = re.sub(r'\\text\{([^}]+)\}', r'\1', text)
+    # Remove math dollar signs surrounding words/variables if present
+    text = re.sub(r'\$([^$]+)\$', r'\1', text)
+    
+    return text
+
 def set_cell_background(cell, fill_hex):
     tcPr = cell._element.get_or_add_tcPr()
     shd = parse_xml(f'<w:shd {nsdecls("w")} w:fill="{fill_hex}"/>')
@@ -26,31 +68,35 @@ def format_table(table, headers, data):
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     hdr_cells = table.rows[0].cells
     for i, title in enumerate(headers):
-        hdr_cells[i].text = title.strip()
-        set_cell_background(hdr_cells[i], "1E293B")  # Dark slate
+        clean_title = clean_text_equations(title.strip())
+        hdr_cells[i].text = clean_title
+        set_cell_background(hdr_cells[i], "F2F2F2")  # Light gray background for clean academic style
         set_cell_margins(hdr_cells[i], top=140, bottom=140, left=180, right=180)
         p = hdr_cells[i].paragraphs[0]
         p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        p.paragraph_format.line_spacing = 1.15
         for run in p.runs:
             run.font.name = 'Times New Roman'
             run.font.bold = True
             run.font.size = Pt(10.5)
-            run.font.color.rgb = RGBColor(255, 255, 255)
+            run.font.color.rgb = RGBColor(0, 0, 0)  # Pure black text
 
     for r_idx, row_data in enumerate(data):
         row_cells = table.rows[r_idx + 1].cells
-        bg_color = "F8FAFC" if r_idx % 2 == 1 else "FFFFFF"
+        bg_color = "FAFAFA" if r_idx % 2 == 1 else "FFFFFF"
         for c_idx, val in enumerate(row_data):
             if c_idx < len(row_cells):
-                row_cells[c_idx].text = val.strip()
+                clean_val = clean_text_equations(val.strip())
+                row_cells[c_idx].text = clean_val
                 set_cell_background(row_cells[c_idx], bg_color)
                 set_cell_margins(row_cells[c_idx], top=100, bottom=100, left=150, right=150)
                 p = row_cells[c_idx].paragraphs[0]
                 p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+                p.paragraph_format.line_spacing = 1.15
                 for run in p.runs:
                     run.font.name = 'Times New Roman'
                     run.font.size = Pt(10)
-                    run.font.color.rgb = RGBColor(15, 23, 42)
+                    run.font.color.rgb = RGBColor(0, 0, 0)  # Pure black text
 
 def append_markdown_to_doc(md_filepath, doc):
     with open(md_filepath, 'r', encoding='utf-8') as f:
@@ -72,7 +118,7 @@ def append_markdown_to_doc(md_filepath, doc):
                 table = doc.add_table(rows=1, cols=1)
                 table.alignment = WD_TABLE_ALIGNMENT.CENTER
                 cell = table.cell(0, 0)
-                set_cell_background(cell, "F1F5F9")
+                set_cell_background(cell, "F8F9FA")
                 set_cell_margins(cell, top=140, bottom=140, left=180, right=180)
                 p = cell.paragraphs[0]
                 p.paragraph_format.space_before = Pt(4)
@@ -81,7 +127,7 @@ def append_markdown_to_doc(md_filepath, doc):
                 run = p.add_run('\n'.join(code_lines))
                 run.font.name = 'Consolas'
                 run.font.size = Pt(9.5)
-                run.font.color.rgb = RGBColor(30, 41, 59)
+                run.font.color.rgb = RGBColor(0, 0, 0)  # Pure black code text
                 
                 p_space = doc.add_paragraph()
                 p_space.paragraph_format.space_after = Pt(6)
@@ -144,7 +190,8 @@ def append_markdown_to_doc(md_filepath, doc):
                 p_cap.paragraph_format.space_after = Pt(14)
                 
                 # Format "Figure X.Y:" as Bold Times New Roman and description text as Italic
-                fig_prefix_match = re.match(r'^(Figure\s+\d+\.\d+:?\s*)(.*)$', caption, re.IGNORECASE)
+                clean_cap = clean_text_equations(caption)
+                fig_prefix_match = re.match(r'^(Figure\s+\d+\.\d+:?\s*)(.*)$', clean_cap, re.IGNORECASE)
                 if fig_prefix_match:
                     prefix = fig_prefix_match.group(1)
                     rest = fig_prefix_match.group(2)
@@ -153,19 +200,19 @@ def append_markdown_to_doc(md_filepath, doc):
                     run_pre.font.name = 'Times New Roman'
                     run_pre.font.size = Pt(10)
                     run_pre.font.bold = True
-                    run_pre.font.color.rgb = RGBColor(15, 23, 42)
+                    run_pre.font.color.rgb = RGBColor(0, 0, 0)
                     
                     run_rest = p_cap.add_run(rest)
                     run_rest.font.name = 'Times New Roman'
                     run_rest.font.size = Pt(10)
                     run_rest.font.italic = True
-                    run_rest.font.color.rgb = RGBColor(51, 65, 85)
+                    run_rest.font.color.rgb = RGBColor(0, 0, 0)
                 else:
-                    run_cap = p_cap.add_run(caption)
+                    run_cap = p_cap.add_run(clean_cap)
                     run_cap.font.name = 'Times New Roman'
                     run_cap.font.size = Pt(10)
                     run_cap.font.italic = True
-                    run_cap.font.color.rgb = RGBColor(51, 65, 85)
+                    run_cap.font.color.rgb = RGBColor(0, 0, 0)
             continue
 
         # Horizontal Rule
@@ -175,54 +222,57 @@ def append_markdown_to_doc(md_filepath, doc):
             p.paragraph_format.space_after = Pt(8)
             continue
 
+        # Clean line text equation strings
+        line_clean = clean_text_equations(line_str)
+
         # Headings
-        if line_str.startswith('# '):
+        if line_clean.startswith('# '):
             p = doc.add_paragraph()
             p.paragraph_format.space_before = Pt(18)
             p.paragraph_format.space_after = Pt(8)
             p.paragraph_format.keep_with_next = True
-            run = p.add_run(line_str[2:])
+            run = p.add_run(line_clean[2:])
             run.font.name = 'Times New Roman'
             run.font.size = Pt(16)
             run.bold = True
-            run.font.color.rgb = RGBColor(15, 23, 42)
-        elif line_str.startswith('## '):
+            run.font.color.rgb = RGBColor(0, 0, 0)
+        elif line_clean.startswith('## '):
             p = doc.add_paragraph()
             p.paragraph_format.space_before = Pt(14)
             p.paragraph_format.space_after = Pt(6)
             p.paragraph_format.keep_with_next = True
-            run = p.add_run(line_str[3:])
+            run = p.add_run(line_clean[3:])
             run.font.name = 'Times New Roman'
             run.font.size = Pt(14)
             run.bold = True
-            run.font.color.rgb = RGBColor(30, 41, 59)
-        elif line_str.startswith('### '):
+            run.font.color.rgb = RGBColor(0, 0, 0)
+        elif line_clean.startswith('### '):
             p = doc.add_paragraph()
             p.paragraph_format.space_before = Pt(12)
             p.paragraph_format.space_after = Pt(4)
             p.paragraph_format.keep_with_next = True
-            run = p.add_run(line_str[4:])
+            run = p.add_run(line_clean[4:])
             run.font.name = 'Times New Roman'
             run.font.size = Pt(12.5)
             run.bold = True
-            run.font.color.rgb = RGBColor(51, 65, 85)
-        elif line_str.startswith('#### '):
+            run.font.color.rgb = RGBColor(0, 0, 0)
+        elif line_clean.startswith('#### '):
             p = doc.add_paragraph()
             p.paragraph_format.space_before = Pt(10)
             p.paragraph_format.space_after = Pt(4)
             p.paragraph_format.keep_with_next = True
-            run = p.add_run(line_str[5:])
+            run = p.add_run(line_clean[5:])
             run.font.name = 'Times New Roman'
-            run.font.size = Pt(11.5)
+            run.font.size = Pt(12)
             run.bold = True
-            run.font.color.rgb = RGBColor(71, 85, 105)
+            run.font.color.rgb = RGBColor(0, 0, 0)
         else:
             p = doc.add_paragraph()
             p.paragraph_format.space_before = Pt(0)
             p.paragraph_format.space_after = Pt(6)
-            p.paragraph_format.line_spacing = 1.15
+            p.paragraph_format.line_spacing = 1.5
 
-            parts = re.split(r'(\*\*.*?\*\*)', line_str)
+            parts = re.split(r'(\*\*.*?\*\*)', line_clean)
             for part in parts:
                 if part.startswith('**') and part.endswith('**'):
                     run = p.add_run(part[2:-2])
@@ -230,8 +280,8 @@ def append_markdown_to_doc(md_filepath, doc):
                 else:
                     run = p.add_run(part)
                 run.font.name = 'Times New Roman'
-                run.font.size = Pt(11.5)
-                run.font.color.rgb = RGBColor(15, 23, 42)
+                run.font.size = Pt(12)
+                run.font.color.rgb = RGBColor(0, 0, 0)
 
     if in_table and table_headers and table_rows:
         cols = len(table_headers)
