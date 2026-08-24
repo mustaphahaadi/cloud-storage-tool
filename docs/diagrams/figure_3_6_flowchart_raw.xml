@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<mxfile host="Electron" modified="2026-08-24T18:15:00.000Z" agent="5.0" version="21.0.0" type="device">
-  <diagram id="heuristic-storage-allocation-flowchart" name="Figure 3.6 Flowchart Logic of Core Algorithm">
-    <mxGraphModel dx="1200" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#ffffff" math="0" shadow="0">
+<mxGraphModel dx="1200" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#ffffff" math="0" shadow="0">
   <root>
     <mxCell id="0" />
     <mxCell id="1" parent="0" />
@@ -71,5 +68,3 @@
     <mxCell id="edge_8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;strokeWidth=1.5;" edge="1" parent="1" source="node_output" target="node_end_success" />
   </root>
 </mxGraphModel>
-  </diagram>
-</mxfile>
