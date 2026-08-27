@@ -1,75 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mxfile host="Electron" modified="2026-08-24T18:15:00.000Z" agent="5.0" version="21.0.0" type="device">
-  <diagram id="heuristic-storage-allocation-flowchart" name="Figure 3.6 Flowchart Logic of Core Algorithm">
-    <mxGraphModel dx="1200" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#ffffff" math="0" shadow="0">
-  <root>
-    <mxCell id="0" />
-    <mxCell id="1" parent="0" />
-    
-    <mxCell id="title" value="Figure 3.6: Multi-Objective Storage Resource Allocation Algorithm Flowchart" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#0F172A;" vertex="1" parent="1">
-      <mxGeometry x="140" y="20" width="570" height="30" as="geometry" />
-    </mxCell>
+<mxfile host="app.diagrams.net" modified="2026-08-27T12:00:00.000Z" version="21.6.8" type="device">
+  <diagram id="heuristic_allocation_flowchart" name="Figure 3.6 Flowchart Logic of Core Algorithm">
+    <mxGraphModel dx="1200" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#FFFFFF">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <mxCell id="title" value="Figure 3.6: Multi-Objective Storage Resource Allocation Algorithm Flowchart" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="140" y="20" width="570" height="30" as="geometry" />
+        </mxCell>
 
-    <mxCell id="node_start" value="START" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0F172A;strokeColor=#0F172A;fontColor=#FFFFFF;fontStyle=1;fontSize=12;" vertex="1" parent="1">
-      <mxGeometry x="370" y="70" width="110" height="40" as="geometry" />
-    </mxCell>
+        <mxCell id="node_start" value="START" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0F172A;strokeColor=#0F172A;fontColor=#FFFFFF;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="370" y="70" width="110" height="40" as="geometry" />
+        </mxCell>
 
-    <mxCell id="node_input" value="Input Workload Parameters &amp; Constraints:&lt;br/&gt;&amp;bull; Storage Size (S_req in GB)&lt;br/&gt;&amp;bull; Availability Target (A_req in %)&lt;br/&gt;&amp;bull; Latency Limit (L_req in ms)&lt;br/&gt;&amp;bull; Budget Limit (B in $)&lt;br/&gt;&amp;bull; Optimization Weights (&amp;#945;, &amp;#946;)" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#E0F2FE;strokeColor=#0284C7;fontColor=#0F172A;fontSize=11;align=center;" vertex="1" parent="1">
-      <mxGeometry x="240" y="140" width="370" height="85" as="geometry" />
-    </mxCell>
+        <mxCell id="node_input" value="Input Workload Parameters &amp; Constraints:&#10;&#8226; Storage Size (S_req in GB)&#10;&#8226; Availability Target (A_req in %)&#10;&#8226; Latency Limit (L_req in ms)&#10;&#8226; Budget Limit (B in $)&#10;&#8226; Optimization Weights (&#945;, &#946;)" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#E0F2FE;strokeColor=#0284C7;fontColor=#0F172A;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="240" y="140" width="370" height="85" as="geometry" />
+        </mxCell>
 
-    <mxCell id="node_db" value="Fetch Active Storage Tiers from SQLite Database&lt;br/&gt;(Block Storage, File Storage, Object Storage)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#E0E7FF;strokeColor=#4338CA;fontColor=#0F172A;fontStyle=1;fontSize=11;" vertex="1" parent="1">
-      <mxGeometry x="275" y="255" width="300" height="55" as="geometry" />
-    </mxCell>
+        <mxCell id="node_db" value="Fetch Active Storage Tiers from SQLite Database&#10;(6 Enterprise Storage Tiers)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#E0E7FF;strokeColor=#4338CA;fontColor=#0F172A;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="275" y="255" width="300" height="55" as="geometry" />
+        </mxCell>
 
-    <mxCell id="node_filter" value="Hard Constraint Pre-Filtering Phase:&lt;br/&gt;For each candidate tier i, verify:&lt;br/&gt;&amp;bull; SLA_i &amp;ge; A_req&lt;br/&gt;&amp;bull; Latency_i &amp;le; L_req&lt;br/&gt;&amp;bull; Total_Cost_i &amp;le; Budget (B)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#64748B;fontColor=#0F172A;fontSize=11;align=center;" vertex="1" parent="1">
-      <mxGeometry x="250" y="340" width="350" height="75" as="geometry" />
-    </mxCell>
+        <mxCell id="node_filter" value="Hard Constraint Pre-Filtering Phase:&#10;For each candidate tier i, verify:&#10;&#8226; SLA_i &gt;= A_req&#10;&#8226; Latency_i &lt;= L_req&#10;&#8226; Total_Cost_i &lt;= Budget (B)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#64748B;fontColor=#0F172A;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="250" y="340" width="350" height="75" as="geometry" />
+        </mxCell>
 
-    <mxCell id="node_decision" value="Any Eligible Tiers&lt;br/&gt;Pass Constraints?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;fontColor=#0F172A;fontStyle=1;fontSize=11;" vertex="1" parent="1">
-      <mxGeometry x="340" y="445" width="170" height="85" as="geometry" />
-    </mxCell>
+        <mxCell id="node_decision" value="Any Eligible Tiers&#10;Pass Constraints?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;fontColor=#0F172A;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="340" y="445" width="170" height="85" as="geometry" />
+        </mxCell>
 
-    <mxCell id="node_error" value="Return Allocation Exception:&lt;br/&gt;&amp;quot;No Tier Meets SLA, Latency,&lt;br/&gt;or Budget Bounds&amp;quot;" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontColor=#991B1B;fontStyle=1;fontSize=11;" vertex="1" parent="1">
-      <mxGeometry x="575" y="460" width="220" height="55" as="geometry" />
-    </mxCell>
+        <mxCell id="node_error" value="Return Allocation Exception:&#10;&quot;No Tier Meets SLA, Latency,&#10;or Budget Bounds&quot;" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontColor=#991B1B;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="575" y="460" width="220" height="55" as="geometry" />
+        </mxCell>
 
-    <mxCell id="node_end_error" value="END (FAIL)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#991B1B;strokeColor=#991B1B;fontColor=#FFFFFF;fontStyle=1;fontSize=11;" vertex="1" parent="1">
-      <mxGeometry x="635" y="545" width="100" height="35" as="geometry" />
-    </mxCell>
+        <mxCell id="node_end_error" value="END (FAIL)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#991B1B;strokeColor=#991B1B;fontColor=#FFFFFF;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="635" y="545" width="100" height="35" as="geometry" />
+        </mxCell>
 
-    <mxCell id="node_norm" value="Min-Max Vector Normalization Phase:&lt;br/&gt;&amp;bull; Compute Total Cost: C_i = Cost_Per_GB_i &amp;times; S_req&lt;br/&gt;&amp;bull; Compute Unavailability: U_i = 1.0 - (SLA_i / 100)&lt;br/&gt;&amp;bull; Normalize Cost: C_norm(i) = (C_i - C_min) / (C_max - C_min)&lt;br/&gt;&amp;bull; Normalize Unavailability: U_norm(i) = (U_i - U_min) / (U_max - U_min)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#64748B;fontColor=#0F172A;fontSize=11;align=center;" vertex="1" parent="1">
-      <mxGeometry x="215" y="565" width="420" height="90" as="geometry" />
-    </mxCell>
+        <mxCell id="node_norm" value="Min-Max Vector Normalization Phase:&#10;&#8226; Compute Total Cost: C_i = Cost_Per_GB_i &#215; S_req&#10;&#8226; Compute Unavailability: U_i = 1.0 - (SLA_i / 100)&#10;&#8226; Normalize Cost: C_norm(i) = (C_i - C_min) / (C_max - C_min)&#10;&#8226; Normalize Unavailability: U_norm(i) = (U_i - U_min) / (U_max - U_min)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#64748B;fontColor=#0F172A;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="215" y="565" width="420" height="90" as="geometry" />
+        </mxCell>
 
-    <mxCell id="node_score" value="Weighted Dual-Objective Scoring Phase:&lt;br/&gt;For each eligible tier i, evaluate score:&lt;br/&gt;&lt;b&gt;Score(i) = &amp;#945; &amp;times; C_norm(i) + &amp;#946; &amp;times; U_norm(i)&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#64748B;fontColor=#0F172A;fontSize=11;align=center;" vertex="1" parent="1">
-      <mxGeometry x="250" y="685" width="350" height="60" as="geometry" />
-    </mxCell>
+        <mxCell id="node_score" value="Weighted Dual-Objective Scoring Phase:&#10;For each eligible tier i, evaluate score:&#10;Score(i) = &#945; &#215; C_norm(i) + &#946; &#215; U_norm(i)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#64748B;fontColor=#0F172A;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="250" y="685" width="350" height="60" as="geometry" />
+        </mxCell>
 
-    <mxCell id="node_select" value="Optimal Storage Tier Selection Phase:&lt;br/&gt;Select Tier i* = argmin(Score(i))" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECFDF5;strokeColor=#059669;fontColor=#064E3B;fontStyle=1;fontSize=11;align=center;" vertex="1" parent="1">
-      <mxGeometry x="275" y="775" width="300" height="50" as="geometry" />
-    </mxCell>
+        <mxCell id="node_select" value="Optimal Storage Tier Selection Phase:&#10;Select Tier i* = argmin(Score(i))" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECFDF5;strokeColor=#059669;fontColor=#064E3B;fontStyle=1;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="275" y="775" width="300" height="50" as="geometry" />
+        </mxCell>
 
-    <mxCell id="node_output" value="Output Recommended Tier i*, Cost Estimate &amp; SLA Prediction&lt;br/&gt;&amp;amp; Save Allocation Transaction Record to SQLite Database" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#E0F2FE;strokeColor=#0284C7;fontColor=#0F172A;fontStyle=1;fontSize=11;align=center;" vertex="1" parent="1">
-      <mxGeometry x="220" y="855" width="410" height="60" as="geometry" />
-    </mxCell>
+        <mxCell id="node_output" value="Output Recommended Tier i*, Cost Estimate &amp; SLA Prediction&#10;&amp; Save Allocation Transaction Record to SQLite Database" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#E0F2FE;strokeColor=#0284C7;fontColor=#0F172A;fontStyle=1;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="220" y="855" width="410" height="60" as="geometry" />
+        </mxCell>
 
-    <mxCell id="node_end_success" value="END (SUCCESS)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#059669;strokeColor=#059669;fontColor=#FFFFFF;fontStyle=1;fontSize=11;" vertex="1" parent="1">
-      <mxGeometry x="365" y="945" width="120" height="40" as="geometry" />
-    </mxCell>
+        <mxCell id="node_end_success" value="END (SUCCESS)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#059669;strokeColor=#059669;fontColor=#FFFFFF;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="365" y="945" width="120" height="40" as="geometry" />
+        </mxCell>
 
-    <mxCell id="edge_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;strokeWidth=1.5;" edge="1" parent="1" source="node_start" target="node_input" />
-    <mxCell id="edge_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;strokeWidth=1.5;" edge="1" parent="1" source="node_input" target="node_db" />
-    <mxCell id="edge_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;strokeWidth=1.5;" edge="1" parent="1" source="node_db" target="node_filter" />
-    <mxCell id="edge_4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;strokeWidth=1.5;" edge="1" parent="1" source="node_filter" target="node_decision" />
-    <mxCell id="edge_no" value="NO" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#DC2626;strokeWidth=1.5;fontColor=#DC2626;fontStyle=1;" edge="1" parent="1" source="node_decision" target="node_error" />
-    <mxCell id="edge_error_end" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#DC2626;strokeWidth=1.5;" edge="1" parent="1" source="node_error" target="node_end_error" />
-    <mxCell id="edge_yes" value="YES" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#059669;strokeWidth=1.5;fontColor=#059669;fontStyle=1;" edge="1" parent="1" source="node_decision" target="node_norm" />
-    <mxCell id="edge_5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;strokeWidth=1.5;" edge="1" parent="1" source="node_norm" target="node_score" />
-    <mxCell id="edge_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;strokeWidth=1.5;" edge="1" parent="1" source="node_score" target="node_select" />
-    <mxCell id="edge_7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;strokeWidth=1.5;" edge="1" parent="1" source="node_select" target="node_output" />
-    <mxCell id="edge_8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;strokeWidth=1.5;" edge="1" parent="1" source="node_output" target="node_end_success" />
-  </root>
-</mxGraphModel>
+        <mxCell id="edge_1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;strokeWidth=1.5;" edge="1" parent="1" source="node_start" target="node_input"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="edge_2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;strokeWidth=1.5;" edge="1" parent="1" source="node_input" target="node_db"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="edge_3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;strokeWidth=1.5;" edge="1" parent="1" source="node_db" target="node_filter"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="edge_4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;strokeWidth=1.5;" edge="1" parent="1" source="node_filter" target="node_decision"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="edge_no" value="NO" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#DC2626;strokeWidth=1.5;fontColor=#DC2626;fontStyle=1;" edge="1" parent="1" source="node_decision" target="node_error"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="edge_error_end" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#DC2626;strokeWidth=1.5;" edge="1" parent="1" source="node_error" target="node_end_error"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="edge_yes" value="YES" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#059669;strokeWidth=1.5;fontColor=#059669;fontStyle=1;" edge="1" parent="1" source="node_decision" target="node_norm"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="edge_5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;strokeWidth=1.5;" edge="1" parent="1" source="node_norm" target="node_score"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="edge_6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;strokeWidth=1.5;" edge="1" parent="1" source="node_score" target="node_select"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="edge_7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;strokeWidth=1.5;" edge="1" parent="1" source="node_select" target="node_output"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="edge_8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;strokeWidth=1.5;" edge="1" parent="1" source="node_output" target="node_end_success"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
   </diagram>
 </mxfile>

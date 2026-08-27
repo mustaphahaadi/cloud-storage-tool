@@ -5,21 +5,17 @@ import pandas as pd
 import plotly.express as px
 
 def app():
-    st.title("Reporting and Performance Evaluation")
-    st.markdown("Generate system reports and evaluate allocation algorithm performance.")
+    st.title("📋 Reporting & Performance Evaluation")
+    st.caption("Historical benchmarking of the proposed α-β heuristic against classical baseline algorithms with data export capabilities.")
     
     df = database.get_allocation_history()
     
     if df.empty:
-        st.info("No data available for reporting.")
+        st.info("No data available for reporting. Please generate some allocation simulations first.", icon=":material/info:")
         return
         
-    st.subheader("Algorithm Historical Performance Comparison")
-    st.markdown("This section simulates how traditional algorithms would have performed on the historical requests compared to the proposed Greedy Heuristic:")
-    
     tiers_df = database.get_storage_tiers()
     
-    # Compute total cost and SLA compliance for all algorithms
     stats = {
         "Proposed Heuristic (α-β)": {"cost": 0.0, "compliant": 0},
         "First Fit": {"cost": 0.0, "compliant": 0},
@@ -32,27 +28,22 @@ def app():
         avail_req = row['availability_req']
         lat_req = row['latency_req']
         
-        # Proposed Heuristic (stored in DB)
         stats["Proposed Heuristic (α-β)"]["cost"] += row['cost_estimate']
         if (row['availability_prediction'] >= avail_req) and (row['latency_prediction'] <= lat_req):
             stats["Proposed Heuristic (α-β)"]["compliant"] += 1
             
-        # Run baselines
-        # First Fit
         ff = heuristic.allocate_first_fit(tiers_df, req_size, avail_req, lat_req)
         if ff is not None:
             stats["First Fit"]["cost"] += ff["cost_estimate"]
             if (ff["availability_prediction"] >= avail_req) and (ff["latency_prediction"] <= lat_req):
                 stats["First Fit"]["compliant"] += 1
                 
-        # Best Fit
         bf = heuristic.allocate_best_fit(tiers_df, req_size, avail_req, lat_req)
         if bf is not None:
             stats["Best Fit"]["cost"] += bf["cost_estimate"]
             if (bf["availability_prediction"] >= avail_req) and (bf["latency_prediction"] <= lat_req):
                 stats["Best Fit"]["compliant"] += 1
                 
-        # Worst Fit
         wf = heuristic.allocate_worst_fit(tiers_df, req_size, avail_req, lat_req)
         if wf is not None:
             stats["Worst Fit"]["cost"] += wf["cost_estimate"]
@@ -67,68 +58,77 @@ def app():
         compliance_rate = (data["compliant"] / total_rows) * 100 if total_rows > 0 else 0
         comparison_rows.append({
             "Allocation Algorithm": algo,
-            "Cumulative Historical Cost ($)": f"${data['cost']:.2f}",
+            "Cumulative Historical Cost ($)": f"${data['cost']:,.2f}",
             "SLA Compliance Rate (%)": f"{compliance_rate:.1f}%"
         })
         plot_data.append({
             "Algorithm": algo,
-            "Cost": data["cost"],
+            "Cost ($)": data["cost"],
             "Compliance Rate (%)": compliance_rate
         })
         
-    st.dataframe(pd.DataFrame(comparison_rows), use_container_width=True)
+    with st.container(border=True):
+        st.markdown("##### ⚖️ Historical Algorithm Benchmarking Summary")
+        st.caption("Simulated cumulative performance across all historical requests:")
+        st.dataframe(pd.DataFrame(comparison_rows), width="stretch")
+        
+        plot_df = pd.DataFrame(plot_data)
+        fig_comp = px.bar(
+            plot_df,
+            x='Algorithm',
+            y='Cost ($)',
+            color='Algorithm',
+            labels={'Cost ($)': 'Cumulative Operational Cost ($)'},
+            title="Cumulative Operational Cost Comparison (Lower is Better)",
+            template="plotly_dark"
+        )
+        fig_comp.update_layout(
+            paper_bgcolor="#1E293B",
+            plot_bgcolor="#0F172A",
+            margin=dict(l=10, r=10, t=40, b=10)
+        )
+        st.plotly_chart(fig_comp, width="stretch")
     
-    # Plot cost comparison
-    plot_df = pd.DataFrame(plot_data)
-    fig_comp = px.bar(plot_df, x='Algorithm', y='Cost', color='Algorithm',
-                      labels={'Cost': 'Cumulative Operational Cost ($)'},
-                      title="Cumulative Operational Cost Comparison (Lower is Better)")
-    st.plotly_chart(fig_comp, use_container_width=True)
+    with st.container(border=True):
+        st.markdown("##### 🔍 SLA Compliance Audit Log")
+        df['sla_met'] = (df['availability_prediction'] >= df['availability_req']) & (df['latency_prediction'] <= df['latency_req'])
+        sla_compliance_df = df[['id', 'created_at', 'required_size', 'availability_req', 'availability_prediction', 'latency_req', 'latency_prediction', 'recommended_tier', 'alpha', 'beta', 'sla_met']]
+        st.dataframe(sla_compliance_df, width="stretch")
     
-    st.markdown("---")
+    with st.container(border=True):
+        st.markdown("##### 💡 Storage Tier Utilization Summary")
+        tier_summary = df.groupby('recommended_tier').agg(
+            total_allocations=('id', 'count'),
+            total_size_gb=('required_size', 'sum'),
+            total_cost=('cost_estimate', 'sum')
+        ).reset_index()
+        
+        tier_summary['avg_cost_per_gb'] = tier_summary['total_cost'] / tier_summary['total_size_gb']
+        st.dataframe(tier_summary, width="stretch")
     
-    st.subheader("SLA Compliance Log")
-    df['sla_met'] = (df['availability_prediction'] >= df['availability_req']) & (df['latency_prediction'] <= df['latency_req'])
-    # include alpha/beta in display
-    sla_compliance_df = df[['id', 'created_at', 'required_size', 'availability_req', 'availability_prediction', 'latency_req', 'latency_prediction', 'recommended_tier', 'alpha', 'beta', 'sla_met']]
-    st.dataframe(sla_compliance_df, use_container_width=True)
-    
-    st.markdown("---")
-    
-    st.subheader("Cost Optimization Insights")
-    tier_summary = df.groupby('recommended_tier').agg(
-        total_allocations=('id', 'count'),
-        total_size_gb=('required_size', 'sum'),
-        total_cost=('cost_estimate', 'sum')
-    ).reset_index()
-    
-    tier_summary['avg_cost_per_gb'] = tier_summary['total_cost'] / tier_summary['total_size_gb']
-    st.dataframe(tier_summary, use_container_width=True)
-    
-    st.markdown("---")
-    
-    st.subheader("Detailed Allocation History")
-    # Rename columns for displaying
-    df_display = df.rename(columns={
-        'required_size': 'Required Size (GB)',
-        'availability_req': 'Availability Req (%)',
-        'latency_req': 'Latency Req (ms)',
-        'budget': 'Budget ($)',
-        'alpha': 'Alpha (Cost Wt)',
-        'beta': 'Beta (Avail Wt)',
-        'recommended_tier': 'Recommended Tier',
-        'cost_estimate': 'Cost Estimate ($)',
-        'availability_prediction': 'Availability Pred (%)',
-        'latency_prediction': 'Latency Pred (ms)',
-        'created_at': 'Timestamp'
-    })
-    st.dataframe(df_display, use_container_width=True)
-    
-    # Export functionality
-    csv = df.to_csv(index=False).encode('utf-8')
-    st.download_button(
-        label="Download Full Report (CSV)",
-        data=csv,
-        file_name='storage_allocation_report.csv',
-        mime='text/csv',
-    )
+    with st.container(border=True):
+        st.markdown("##### 📜 Full Allocation Transaction History")
+        df_display = df.rename(columns={
+            'required_size': 'Required Size (GB)',
+            'availability_req': 'Availability Req (%)',
+            'latency_req': 'Latency Req (ms)',
+            'budget': 'Budget ($)',
+            'alpha': 'Alpha (Cost Wt)',
+            'beta': 'Beta (Avail Wt)',
+            'recommended_tier': 'Recommended Tier',
+            'cost_estimate': 'Cost Estimate ($)',
+            'availability_prediction': 'Availability Pred (%)',
+            'latency_prediction': 'Latency Pred (ms)',
+            'created_at': 'Timestamp'
+        })
+        st.dataframe(df_display, width="stretch")
+        
+        csv = df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="📥 Download Full Evaluation Report (CSV)",
+            data=csv,
+            file_name='storage_allocation_report.csv',
+            mime='text/csv',
+            type="primary"
+        )
+

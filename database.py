@@ -44,13 +44,18 @@ def init_db():
     
     conn.commit()
     
-    # Seed default tiers if empty
+    # Seed default tiers if fewer than 6 exist
     cursor.execute("SELECT COUNT(*) FROM storage_tiers")
-    if cursor.fetchone()[0] == 0:
+    count = cursor.fetchone()[0]
+    if count < 6:
+        cursor.execute("DELETE FROM storage_tiers")
         default_tiers = [
-            ('Block Storage', 0.15, 99.999, 2.0),
-            ('File Storage', 0.08, 99.99, 10.0),
-            ('Object Storage', 0.02, 99.0, 50.0)
+            ('Ultra High-Performance Block Storage (NVMe)', 0.25, 99.9999, 0.5),
+            ('Premium SSD Block Storage', 0.15, 99.999, 2.0),
+            ('General Purpose Block Storage', 0.09, 99.95, 5.0),
+            ('High-Throughput File Storage (NFS/SMB)', 0.06, 99.99, 10.0),
+            ('Hot Object Storage (Standard S3)', 0.023, 99.9, 25.0),
+            ('Cool System Archive Storage', 0.004, 99.0, 100.0)
         ]
         cursor.executemany(
             "INSERT INTO storage_tiers (name, cost_per_gb, sla_availability, access_latency) VALUES (?, ?, ?, ?)",

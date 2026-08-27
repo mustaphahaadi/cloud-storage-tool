@@ -4,39 +4,76 @@ import pandas as pd
 import plotly.express as px
 
 def app():
-    st.title("Monitoring")
-    st.markdown("Monitor storage growth, utilization, and cost trends over time.")
+    st.title("📡 Performance & Capacity Monitoring")
+    st.caption("Real-time telemetry tracking cumulative storage growth, cost accumulation, and workload allocation profiles.")
     
     df = database.get_allocation_history()
     
     if df.empty:
-        st.info("No data available for monitoring. Please generate some allocations first.")
+        st.info("No allocation telemetry recorded yet. Please run an Allocation Simulation to generate monitoring data.", icon=":material/info:")
         return
         
-    # Convert created_at to datetime
     df['created_at'] = pd.to_datetime(df['created_at'])
     df = df.sort_values('created_at')
     
-    # Cumulative Sums over time
     df['cumulative_size'] = df['required_size'].cumsum()
     df['cumulative_cost'] = df['cost_estimate'].cumsum()
     
-    st.subheader("Storage Growth Trend")
-    fig_growth = px.line(df, x='created_at', y='cumulative_size', markers=True,
-                         labels={'created_at': 'Time', 'cumulative_size': 'Total Allocated (GB)'},
-                         title="Cumulative Storage Allocated Over Time")
-    st.plotly_chart(fig_growth, use_container_width=True)
+    col1, col2 = st.columns(2)
     
-    st.subheader("Cost Trend Analysis")
-    fig_cost = px.area(df, x='created_at', y='cumulative_cost',
-                       labels={'created_at': 'Time', 'cumulative_cost': 'Total Cost ($)'},
-                       title="Cumulative Cost Over Time",
-                       color_discrete_sequence=['#ff7f0e'])
-    st.plotly_chart(fig_cost, use_container_width=True)
-    
-    st.subheader("Recent Allocation Profiles (Latency vs Size)")
-    fig_scatter = px.scatter(df, x='required_size', y='latency_req', color='recommended_tier',
-                             size='cost_estimate', hover_data=['availability_req', 'latency_prediction', 'availability_prediction', 'alpha', 'beta'],
-                             labels={'required_size': 'Size (GB)', 'latency_req': 'Max Tolerable Latency (ms)', 'recommended_tier': 'Storage Tier'},
-                             title="Allocation Profile: Size vs Latency Requirement")
-    st.plotly_chart(fig_scatter, use_container_width=True)
+    with col1:
+        with st.container(border=True):
+            st.markdown("##### 📈 Cumulative Storage Capacity Growth (GB)")
+            fig_growth = px.line(
+                df,
+                x='created_at',
+                y='cumulative_size',
+                markers=True,
+                labels={'created_at': 'Timestamp', 'cumulative_size': 'Total Storage (GB)'},
+                template="plotly_dark"
+            )
+            fig_growth.update_traces(line=dict(color="#3B82F6", width=3), marker=dict(size=6, color="#60A5FA"))
+            fig_growth.update_layout(
+                paper_bgcolor="#1E293B",
+                plot_bgcolor="#0F172A",
+                margin=dict(l=10, r=10, t=30, b=10)
+            )
+            st.plotly_chart(fig_growth, width="stretch")
+            
+    with col2:
+        with st.container(border=True):
+            st.markdown("##### 💰 Cumulative Operational Spend Accumulation ($)")
+            fig_cost = px.area(
+                df,
+                x='created_at',
+                y='cumulative_cost',
+                labels={'created_at': 'Timestamp', 'cumulative_cost': 'Total Spend ($)'},
+                template="plotly_dark",
+                color_discrete_sequence=['#10B981']
+            )
+            fig_cost.update_layout(
+                paper_bgcolor="#1E293B",
+                plot_bgcolor="#0F172A",
+                margin=dict(l=10, r=10, t=30, b=10)
+            )
+            st.plotly_chart(fig_cost, width="stretch")
+            
+    with st.container(border=True):
+        st.markdown("##### 🎯 Workload Allocation Profiles (Capacity vs Access Latency)")
+        fig_scatter = px.scatter(
+            df,
+            x='required_size',
+            y='latency_req',
+            color='recommended_tier',
+            size='cost_estimate',
+            hover_data=['availability_req', 'latency_prediction', 'availability_prediction', 'alpha', 'beta'],
+            labels={'required_size': 'Capacity (GB)', 'latency_req': 'Max Tolerable Latency (ms)', 'recommended_tier': 'Storage Tier'},
+            template="plotly_dark"
+        )
+        fig_scatter.update_layout(
+            paper_bgcolor="#1E293B",
+            plot_bgcolor="#0F172A",
+            margin=dict(l=10, r=10, t=30, b=10)
+        )
+        st.plotly_chart(fig_scatter, width="stretch")
+

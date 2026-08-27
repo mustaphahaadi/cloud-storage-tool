@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-08-27T13:00:00.000Z" version="21.6.8" type="device">
+  <diagram id="sprint_cycle_diagram" name="Figure 3.1 Scrum Sprint Cycle Diagram">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="#FFFFFF">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <mxCell id="title" value="Figure 3.1: Design Science Research (DSR) Iterative Scrum Sprint Cycle Framework" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="200" y="20" width="700" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Product Backlog -->
+        <mxCell id="s1" value="PRODUCT BACKLOG&#10;&#8226; Functional Requirements&#10;&#8226; Latency &amp; SLA Bounds&#10;&#8226; Multi-Tier Storage Catalog&#10;&#8226; Dual-Objective Priorities" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#0F172A;fontColor=#FFFFFF;fontStyle=1;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="80" y="160" width="200" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Sprint Planning -->
+        <mxCell id="s2" value="SPRINT PLANNING&#10;&#8226; Sprint 1: Data Model &amp; DDL&#10;&#8226; Sprint 2: Core Algorithm Logic&#10;&#8226; Sprint 3: UI Redesign &amp; Telemetry&#10;&#8226; Sprint 4: Benchmarking" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#3B82F6;strokeColor=#1D4ED8;fontColor=#FFFFFF;fontStyle=1;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="340" y="160" width="210" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Iterative Sprint Execution (Circle) -->
+        <mxCell id="s3" value="ITERATIVE SPRINT EXECUTION&#10;(2-Week Scrum Cycles)&#10;&#8226; Code Module Development&#10;&#8226; Min-Max Scaler Verification&#10;&#8226; Dark Theme Component Build" style="ellipse;whiteSpace=wrap;html=1;fillColor=#10B981;strokeColor=#059669;fontColor=#FFFFFF;fontStyle=1;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="610" y="120" width="220" height="200" as="geometry" />
+        </mxCell>
+
+        <!-- Potentially Shippable Increment -->
+        <mxCell id="s4" value="SHIPPABLE SOFTWARE INCREMENT&#10;&#8226; Working Streamlit Application&#10;&#8226; SQLite Telemetry Audit Database&#10;&#8226; Algorithm Evaluation Reports" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#059669;strokeColor=#047857;fontColor=#FFFFFF;fontStyle=1;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="890" y="160" width="210" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Connectors -->
+        <mxCell id="c1" style="endArrow=classic;html=1;strokeWidth=2.5;strokeColor=#3B82F6;" edge="1" parent="1" source="s1" target="s2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="c2" style="endArrow=classic;html=1;strokeWidth=2.5;strokeColor=#10B981;" edge="1" parent="1" source="s2" target="s3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="c3" style="endArrow=classic;html=1;strokeWidth=2.5;strokeColor=#059669;" edge="1" parent="1" source="s3" target="s4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="c4" value="Sprint Review &amp; Retrospective Feedback Loop" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#D97706;dashed=1;curved=1;" edge="1" parent="1" source="s4" target="s1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1000" y="360" />
+              <mxPoint x="180" y="360" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

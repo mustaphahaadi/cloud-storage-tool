@@ -6,14 +6,31 @@ from modules import dashboard, allocation, monitoring, reporting
 # Initialize Database
 database.init_db()
 
-st.set_page_config(page_title="SLA-Aware Cloud Storage Allocation Optimizer", layout="wide", page_icon="🗄️")
+st.set_page_config(
+    page_title="SLA-Aware Cloud Storage Optimizer",
+    layout="wide",
+    page_icon=":material/cloud_done:"
+)
 
-st.sidebar.title("System Navigation")
-menu = ["Dashboard", "Allocation Simulation", "Performance Monitoring", "Reporting & Evaluation"]
-choice = st.sidebar.radio("Go to", menu)
+st.sidebar.markdown("## ☁️ Storage Optimizer")
+st.sidebar.markdown(":green-badge[● System Online] :blue-badge[v2.4 Enterprise]")
 
-st.sidebar.markdown("---")
-st.sidebar.info("Heuristic Approach to Storage Resource Allocation for Cost Reduction and Service Level Agreement (SLA)-Aware Availability.")
+menu_options = {
+    "Dashboard": ":material/dashboard: Executive Dashboard",
+    "Allocation Simulation": ":material/tune: Allocation Simulation",
+    "Performance Monitoring": ":material/monitoring: Performance Monitoring",
+    "Reporting & Evaluation": ":material/analytics: Reporting & Evaluation"
+}
+
+choice = st.sidebar.radio(
+    "System Navigation",
+    options=list(menu_options.keys()),
+    format_func=lambda x: menu_options[x]
+)
+
+st.sidebar.caption(
+    "**Project Architecture**: Heuristic Approach to Storage Resource Allocation for Cost Reduction and SLA-Aware Availability."
+)
 
 if choice == "Dashboard":
     dashboard.app()
@@ -23,3 +40,4 @@ elif choice == "Performance Monitoring":
     monitoring.app()
 elif choice == "Reporting & Evaluation":
     reporting.app()
+

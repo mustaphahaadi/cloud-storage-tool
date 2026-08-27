@@ -2,6 +2,7 @@ import streamlit as st
 import database
 import heuristic
 import pandas as pd
+import plotly.express as px
 
 def app():
     st.title("⚡ Storage Resource Allocation Simulation")
@@ -10,7 +11,7 @@ def app():
     st.subheader("🤖 Automatic Storage Size Suggestion Engine")
     st.caption("Select your workload category and operational parameters to automatically calculate the recommended storage size.")
 
-    with st.expander("Configure Workload Estimation Parameters", expanded=True):
+    with st.container(border=True):
         category = st.selectbox(
             "Select Workload Profile Category",
             options=[
@@ -61,81 +62,120 @@ def app():
                 params["retention_count"] = st.number_input("Retention Snapshots", min_value=1, max_value=24, value=8, step=1)
 
         suggested_gb = heuristic.suggest_workload_size(category, params)
-        st.info(f"💡 **Automated Storage Recommendation**: **{suggested_gb:,.2f} GB** calculated for **{category}**.")
-
-    st.markdown("---")
+        st.info(f"💡 **Automated Capacity Target**: Calculated **{suggested_gb:,.2f} GB** for **{category}**.", icon=":material/memory:")
 
     with st.form("allocation_form"):
-        st.subheader("Allocation Constraints & Optimization Weights")
+        st.subheader("⚙️ Constraints & Multi-Objective Weights")
         col1, col2 = st.columns(2)
 
         with col1:
             required_size = st.number_input(
-                "Required Storage Size (GB)",
+                "Required Storage Capacity (GB)",
                 min_value=1.0,
                 max_value=50000.0,
                 value=float(suggested_gb),
                 step=50.0,
-                help="Automatically populated by the Workload Estimation Engine above. Can be manually adjusted if required."
+                help="Automatically populated by Workload Estimation Engine. Adjustable."
             )
             latency_req = st.number_input(
                 "Max Tolerable Access Latency (ms)",
-                min_value=1.0,
+                min_value=0.5,
                 max_value=100.0,
                 value=15.0,
-                step=1.0,
-                help="Specify the maximum tolerable latency for accessing storage."
+                step=0.5,
+                help="Maximum access latency tolerable by application workloads."
             )
 
         with col2:
             availability_req = st.selectbox(
-                "Availability Requirement (SLA %)",
+                "Availability Target (SLA %)",
                 options=[99.0, 99.9, 99.99, 99.999],
                 index=1
             )
             budget = st.number_input(
-                "Budget Constraints ($) (Optional)",
+                "Budget Bound ($) (Optional)",
                 min_value=0.0,
                 value=0.0,
                 step=10.0,
-                help="Leave at 0.0 for no budget constraint"
+                help="Leave at 0.0 for unconstrained budget allocation."
             )
 
-        st.markdown("---")
-        st.subheader("Multi-Objective Heuristic Configuration")
+        st.markdown("##### 🎚️ Heuristic Trade-off Weights")
         alpha = st.slider(
             "Cost Optimization Weight (α)",
             min_value=0.0,
             max_value=1.0,
             value=0.5,
             step=0.1,
-            help="Higher alpha prioritizes low cost. Lower alpha prioritizes higher availability (SLA compliance)."
+            help="Higher α prioritizes lower cost. Lower α prioritizes higher availability SLA."
         )
         beta_val = round(1.0 - alpha, 2)
-        st.caption(f"Availability Weight (β): {beta_val}")
+        
+        if alpha > 0.5:
+            mode_badge = ":orange-badge[Cost-Prioritized Mode]"
+        elif alpha < 0.5:
+            mode_badge = ":blue-badge[Availability-Prioritized Mode]"
+        else:
+            mode_badge = ":green-badge[Balanced Dual-Objective Mode]"
 
-        submit_button = st.form_submit_button(label="Generate Storage Recommendation")
+        st.markdown(f"**Availability Weight (β)**: `{beta_val}` &nbsp; {mode_badge}")
+
+        submit_button = st.form_submit_button(label="🚀 Generate Storage Recommendation", type="primary")
 
     if submit_button:
         budget_val = budget if budget > 0 else None
 
-        with st.spinner("Running Multi-Objective Heuristic..."):
+        with st.spinner("Executing α-β Dual-Objective Heuristic Scoring..."):
             result = heuristic.allocate_storage(required_size, availability_req, latency_req, budget_val, alpha=alpha, beta=beta_val)
 
         if result["success"]:
-            st.success("Allocation Recommendation Generated Successfully!")
+            st.success("Allocation Recommendation Generated Successfully!", icon=":material/check_circle:")
 
-            st.markdown("### Recommendation Details")
-            r_col1, r_col2, r_col3, r_col4, r_col5 = st.columns(5)
-            r_col1.metric("Recommended Tier", result["tier_name"])
-            r_col2.metric("Estimated Cost", f"${result['cost_estimate']:,.2f}")
-            r_col3.metric("Availability SLA", f"{result['availability_prediction']}%")
-            r_col4.metric("Access Latency", f"{result['latency_prediction']} ms")
-            r_col5.metric("Weights (α / β)", f"{alpha} / {beta_val}")
+            st.subheader("🎯 Recommendation Summary")
+            
+            # Recommendation Header Banner (No Truncation)
+            with st.container(border=True):
+                m_top1, m_top2 = st.columns([3, 1])
+                with m_top1:
+                    st.caption("RECOMMENDED STORAGE TIER")
+                    st.markdown(f"### 📦 {result['tier_name']}")
+                    st.markdown(":green-badge[● Optimal Choice] :blue-badge[SLA Compliant]")
+                with m_top2:
+                    st.caption("ESTIMATED MONTHLY COST")
+                    st.markdown(f"### **${result['cost_estimate']:,.2f}**")
+                    st.caption(f"Capacity: {required_size:,.1f} GB")
+
+                st.markdown("---")
+
+                m_col1, m_col2, m_col3, m_col4 = st.columns(4)
+                m_col1.metric("Guaranteed SLA", f"{result['availability_prediction']}%")
+                m_col2.metric("Access Latency", f"{result['latency_prediction']} ms")
+                m_col3.metric("Cost Weight (α)", f"{alpha:.1f}")
+                m_col4.metric("Availability Weight (β)", f"{beta_val:.1f}")
+
+            # Candidate Tier Scoring Breakdown Table
+            st.subheader("📊 Candidate Tier Scoring Breakdown")
+            st.caption("Normalized dual-objective scoring matrix across eligible candidate tiers ($C_{norm}$ = Normalized Cost, $U_{norm}$ = Normalized Unavailability):")
+            
+            if "scoring_breakdown" in result:
+                breakdown_rows = []
+                for item in result["scoring_breakdown"]:
+                    breakdown_rows.append({
+                        "Status": "⭐ RECOMMENDED" if item["is_selected"] else "Eligible",
+                        "Storage Tier": item["tier_name"],
+                        "Cost / GB ($)": f"${item['cost_per_gb']:.3f}",
+                        "Total Monthly Cost ($)": f"${item['total_cost']:,.2f}",
+                        "SLA Availability (%)": f"{item['sla_availability']}%",
+                        "Access Latency (ms)": f"{item['access_latency']} ms",
+                        "Norm Cost (C_norm)": f"{item['c_norm']:.4f}",
+                        "Norm Unavail (U_norm)": f"{item['u_norm']:.4f}",
+                        "Weighted Score": f"{item['score']:.4f}"
+                    })
+                st.dataframe(pd.DataFrame(breakdown_rows), width="stretch")
 
             # Comparative Evaluation Table
-            st.markdown("### Algorithm Comparative Analysis")
-            st.info("Comparison between the proposed α-β Dual-Objective Heuristic and traditional baseline algorithms:")
+            st.subheader("⚖️ Algorithm Comparative Benchmark")
+            st.caption("Performance comparison between the proposed α-β Dual-Objective Heuristic and traditional baseline algorithms:")
 
             baselines = result["baselines"]
             comparison_rows = []
@@ -158,7 +198,43 @@ def app():
                         "Access Latency": f"{data['latency_prediction']} ms",
                         "Feasible (SLA Met)": "✅ Yes"
                     })
-            st.dataframe(pd.DataFrame(comparison_rows), use_container_width=True)
+            st.dataframe(pd.DataFrame(comparison_rows), width="stretch")
+
+            # Alpha Sensitivity Curve
+            st.subheader("📈 Cost Weight Sensitivity Curve (α vs Monthly Spend)")
+            sensitivity_data = []
+            for a_test in [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]:
+                b_test = round(1.0 - a_test, 2)
+                res_test = heuristic.allocate_storage(required_size, availability_req, latency_req, budget_val, alpha=a_test, beta=b_test)
+                if res_test["success"]:
+                    sensitivity_data.append({
+                        "Cost Weight (α)": a_test,
+                        "Availability Weight (β)": b_test,
+                        "Recommended Tier": res_test["tier_name"],
+                        "Estimated Cost ($)": res_test["cost_estimate"]
+                    })
+            if sensitivity_data:
+                sens_df = pd.DataFrame(sensitivity_data)
+                fig_sens = px.line(
+                    sens_df,
+                    x="Cost Weight (α)",
+                    y="Estimated Cost ($)",
+                    text="Recommended Tier",
+                    markers=True,
+                    title="Impact of Cost Weight (α) on Tier Selection & Monthly Cost",
+                    template="plotly_dark"
+                )
+                fig_sens.update_traces(
+                    line=dict(color="#3B82F6", width=3),
+                    marker=dict(size=8, color="#10B981"),
+                    textposition="top center"
+                )
+                fig_sens.update_layout(
+                    paper_bgcolor="#1E293B",
+                    plot_bgcolor="#0F172A",
+                    margin=dict(l=20, r=20, t=50, b=20)
+                )
+                st.plotly_chart(fig_sens, width="stretch")
 
             # Save to database
             database.save_allocation(
@@ -173,14 +249,14 @@ def app():
                 availability_prediction=result["availability_prediction"],
                 latency_prediction=result["latency_prediction"]
             )
-            st.info("This allocation has been recorded in the database.")
+            st.toast("Allocation successfully logged to database!", icon="💾")
 
         else:
-            st.error("Failed to generate recommendation.")
+            st.error("Failed to generate recommendation.", icon=":material/error:")
             st.warning(result["message"])
 
     # Show available tiers reference
-    with st.expander("View Available Storage Tiers"):
+    with st.expander("🔍 View Active Storage Tier Catalog"):
         tiers_df = database.get_storage_tiers()
         tiers_df_display = tiers_df.rename(columns={
             "id": "Tier ID",
@@ -189,4 +265,5 @@ def app():
             "sla_availability": "SLA Availability (%)",
             "access_latency": "Access Latency (ms)"
         })
-        st.dataframe(tiers_df_display, use_container_width=True)
+        st.dataframe(tiers_df_display, width="stretch")
+

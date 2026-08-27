@@ -124,14 +124,35 @@ def allocate_storage(required_size, availability_req, latency_req, budget=None, 
     cost_range = max_cost - min_cost
     unavail_range = max_unavail - min_unavail
     
+    c_norms = []
+    u_norms = []
     scores = []
     for idx, row in eligible_tiers.iterrows():
         c_norm = (row['total_cost'] - min_cost) / cost_range if cost_range > 0 else 0.0
         u_norm = (row['unavailability'] - min_unavail) / unavail_range if unavail_range > 0 else 0.0
+        c_norms.append(c_norm)
+        u_norms.append(u_norm)
         scores.append(alpha * c_norm + beta * u_norm)
         
+    eligible_tiers['c_norm'] = c_norms
+    eligible_tiers['u_norm'] = u_norms
     eligible_tiers['score'] = scores
     best_tier = eligible_tiers.loc[eligible_tiers['score'].idxmin()]
+    
+    scoring_breakdown = []
+    for idx, row in eligible_tiers.iterrows():
+        scoring_breakdown.append({
+            "tier_id": int(row['id']),
+            "tier_name": row['name'],
+            "cost_per_gb": float(row['cost_per_gb']),
+            "total_cost": float(row['total_cost']),
+            "sla_availability": float(row['sla_availability']),
+            "access_latency": float(row['access_latency']),
+            "c_norm": round(float(row['c_norm']), 4),
+            "u_norm": round(float(row['u_norm']), 4),
+            "score": round(float(row['score']), 4),
+            "is_selected": bool(row['id'] == best_tier['id'])
+        })
     
     baselines = {
         "heuristic": {
@@ -152,5 +173,6 @@ def allocate_storage(required_size, availability_req, latency_req, budget=None, 
         "cost_estimate": float(best_tier['total_cost']),
         "availability_prediction": float(best_tier['sla_availability']),
         "latency_prediction": float(best_tier['access_latency']),
+        "scoring_breakdown": scoring_breakdown,
         "baselines": baselines
     }
