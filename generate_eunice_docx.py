@@ -302,66 +302,48 @@ def parse_markdown_to_docx(md_filepath, docx_filepath):
 
 def generate_combined_chapter_4_and_5():
     docs_dir = os.path.join(os.path.dirname(__file__), 'docs')
-    ch4_md = os.path.join(docs_dir, 'Chapter_4_System_Implementation_Testing.md')
-    ch5_md = os.path.join(docs_dir, 'Chapter_5_Discussion_Conclusion_Recom.md')
+    ch4_docx = os.path.join(docs_dir, 'Chapter_4_Eunice.docx')
+    ch5_docx = os.path.join(docs_dir, 'Chapter_5_Eunice.docx')
     combined_docx = os.path.join(docs_dir, 'Chapter_4_and_5_Eunice.docx')
-    combined_md = os.path.join(docs_dir, 'Chapter_4_and_5_Eunice.md')
 
-    # 1. Create combined Markdown file
-    with open(ch4_md, 'r', encoding='utf-8') as f4:
-        content4 = f4.read()
-    with open(ch5_md, 'r', encoding='utf-8') as f5:
-        content5 = f5.read()
-
-    combined_markdown = content4 + "\n\n---\n\n" + content5
-    with open(combined_md, 'w', encoding='utf-8') as f_out:
-        f_out.write(combined_markdown)
-    print(f"Successfully generated Combined Markdown file at {combined_md}")
-
-    # 2. Create combined Word Document
-    doc = docx.Document()
-    for s in doc.sections:
-        s.top_margin = Inches(1)
-        s.bottom_margin = Inches(1)
-        s.left_margin = Inches(1)
-        s.right_margin = Inches(1)
-
-    append_markdown_to_doc(ch4_md, doc)
-    doc.add_page_break()
-    append_markdown_to_doc(ch5_md, doc)
-
-    doc.save(combined_docx)
+    doc4 = docx.Document(ch4_docx)
+    doc4.add_page_break()
+    sectPr = doc4.element.body.xpath('w:sectPr')[0]
+    doc5 = docx.Document(ch5_docx)
+    for element in list(doc5.element.body):
+        tag = element.tag.split('}')[-1]
+        if tag in ('p', 'tbl'):
+            sectPr.addprevious(element)
+    doc4.save(combined_docx)
     print(f"Successfully generated Combined Chapter 4 & 5 Word Document at {combined_docx}")
 
 def generate_full_dissertation():
     docs_dir = os.path.join(os.path.dirname(__file__), 'docs')
     ch123_docx = os.path.join(docs_dir, 'Chap_1_2_3_Eunice.docx')
-    ch4_md = os.path.join(docs_dir, 'Chapter_4_System_Implementation_Testing.md')
-    ch5_md = os.path.join(docs_dir, 'Chapter_5_Discussion_Conclusion_Recom.md')
-    full_docx = os.path.join(docs_dir, 'Full_Project_Dissertation_Eunice.docx')
+    ch4_docx = os.path.join(docs_dir, 'Chapter_4_Eunice.docx')
+    ch5_docx = os.path.join(docs_dir, 'Chapter_5_Eunice.docx')
+    full_docx = os.path.join(docs_dir, 'Chapter_1_2_3_4_5_Eunice.docx')
 
-    if os.path.exists(ch123_docx):
-        doc = docx.Document(ch123_docx)
-    else:
-        doc = docx.Document()
+    doc123 = docx.Document(ch123_docx)
+    sectPr = doc123.element.body.xpath('w:sectPr')[0]
+    
+    doc4 = docx.Document(ch4_docx)
+    doc123.add_page_break()
+    for element in list(doc4.element.body):
+        tag = element.tag.split('}')[-1]
+        if tag in ('p', 'tbl'):
+            sectPr.addprevious(element)
 
-    doc.add_page_break()
-    append_markdown_to_doc(ch4_md, doc)
+    doc5 = docx.Document(ch5_docx)
+    doc123.add_page_break()
+    for element in list(doc5.element.body):
+        tag = element.tag.split('}')[-1]
+        if tag in ('p', 'tbl'):
+            sectPr.addprevious(element)
 
-    doc.add_page_break()
-    append_markdown_to_doc(ch5_md, doc)
-
-    doc.save(full_docx)
+    doc123.save(full_docx)
     print(f"Successfully generated Full Dissertation Word Document at {full_docx}")
 
 if __name__ == "__main__":
-    docs_dir = os.path.join(os.path.dirname(__file__), 'docs')
-    ch4_md = os.path.join(docs_dir, 'Chapter_4_System_Implementation_Testing.md')
-    ch4_docx = os.path.join(docs_dir, 'Chapter_4_System_Implementation_Testing.docx')
-    ch5_md = os.path.join(docs_dir, 'Chapter_5_Discussion_Conclusion_Recom.md')
-    ch5_docx = os.path.join(docs_dir, 'Chapter_5_Discussion_Conclusion_Recom.docx')
-
-    parse_markdown_to_docx(ch4_md, ch4_docx)
-    parse_markdown_to_docx(ch5_md, ch5_docx)
     generate_combined_chapter_4_and_5()
     generate_full_dissertation()
