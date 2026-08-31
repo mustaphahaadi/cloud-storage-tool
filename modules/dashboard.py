@@ -41,11 +41,11 @@ def app():
                 values='cost_estimate',
                 names='recommended_tier',
                 hole=0.4,
-                template="plotly_dark"
+                template="plotly_white"
             )
             fig1.update_layout(
-                paper_bgcolor="#1E293B",
-                plot_bgcolor="#0F172A",
+                paper_bgcolor="#FFFFFF",
+                plot_bgcolor="#F8FAFC",
                 margin=dict(l=10, r=10, t=30, b=10)
             )
             st.plotly_chart(fig1, width="stretch")
@@ -60,11 +60,11 @@ def app():
                 y='required_size',
                 labels={'recommended_tier': 'Storage Tier', 'required_size': 'Capacity (GB)'},
                 color='recommended_tier',
-                template="plotly_dark"
+                template="plotly_white"
             )
             fig2.update_layout(
-                paper_bgcolor="#1E293B",
-                plot_bgcolor="#0F172A",
+                paper_bgcolor="#FFFFFF",
+                plot_bgcolor="#F8FAFC",
                 margin=dict(l=10, r=10, t=30, b=10)
             )
             st.plotly_chart(fig2, width="stretch")

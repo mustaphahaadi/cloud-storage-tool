@@ -30,12 +30,12 @@ def app():
                 y='cumulative_size',
                 markers=True,
                 labels={'created_at': 'Timestamp', 'cumulative_size': 'Total Storage (GB)'},
-                template="plotly_dark"
+                template="plotly_white"
             )
-            fig_growth.update_traces(line=dict(color="#3B82F6", width=3), marker=dict(size=6, color="#60A5FA"))
+            fig_growth.update_traces(line=dict(color="#2563EB", width=3), marker=dict(size=6, color="#3B82F6"))
             fig_growth.update_layout(
-                paper_bgcolor="#1E293B",
-                plot_bgcolor="#0F172A",
+                paper_bgcolor="#FFFFFF",
+                plot_bgcolor="#F8FAFC",
                 margin=dict(l=10, r=10, t=30, b=10)
             )
             st.plotly_chart(fig_growth, width="stretch")
@@ -48,12 +48,12 @@ def app():
                 x='created_at',
                 y='cumulative_cost',
                 labels={'created_at': 'Timestamp', 'cumulative_cost': 'Total Spend ($)'},
-                template="plotly_dark",
-                color_discrete_sequence=['#10B981']
+                template="plotly_white",
+                color_discrete_sequence=['#059669']
             )
             fig_cost.update_layout(
-                paper_bgcolor="#1E293B",
-                plot_bgcolor="#0F172A",
+                paper_bgcolor="#FFFFFF",
+                plot_bgcolor="#F8FAFC",
                 margin=dict(l=10, r=10, t=30, b=10)
             )
             st.plotly_chart(fig_cost, width="stretch")
@@ -68,11 +68,11 @@ def app():
             size='cost_estimate',
             hover_data=['availability_req', 'latency_prediction', 'availability_prediction', 'alpha', 'beta'],
             labels={'required_size': 'Capacity (GB)', 'latency_req': 'Max Tolerable Latency (ms)', 'recommended_tier': 'Storage Tier'},
-            template="plotly_dark"
+            template="plotly_white"
         )
         fig_scatter.update_layout(
-            paper_bgcolor="#1E293B",
-            plot_bgcolor="#0F172A",
+            paper_bgcolor="#FFFFFF",
+            plot_bgcolor="#F8FAFC",
             margin=dict(l=10, r=10, t=30, b=10)
         )
         st.plotly_chart(fig_scatter, width="stretch")

@@ -1,304 +1,63 @@
 import os
 import re
+import io
 import docx
+from copy import deepcopy
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT
-from docx.oxml import OxmlElement, parse_xml
-from docx.oxml.ns import qn, nsdecls
 
-def clean_text_equations(text):
-    """
-    Cleans up any stray LaTeX string artifacts into clean, readable typography.
-    """
-    if not text:
-        return text
+def append_doc_with_rebound_images_and_tables(src_path, dest_doc):
+    src_doc = docx.Document(src_path)
+    sectPr = dest_doc.element.body.xpath('w:sectPr')[0]
     
-    # Replace LaTeX commands
-    replacements = [
-        (r'\alpha', 'α'),
-        (r'\beta', 'β'),
-        (r'\times', '×'),
-        (r'\cdot', '×'),
-        (r'\rightarrow', '→'),
-        (r'\in', '∈'),
-        (r'\min', 'min'),
-        (r'\max', 'max'),
-        (r'S_{\text{req}}', 'S_req'),
-        (r'C_{\text{norm}}', 'C_norm'),
-        (r'U_{\text{norm}}', 'U_norm'),
-        (r'C_{\text{max}}', 'C_max'),
-        (r'C_{\text{min}}', 'C_min'),
-        (r'U_{\text{max}}', 'U_max'),
-        (r'U_{\text{min}}', 'U_min'),
-        (r'SLA_{\text{req}}', 'SLA_req'),
-        (r'Latency_{\text{req}}', 'Latency_req'),
-        (r'\text{req}', 'req'),
-        (r'\text{norm}', 'norm'),
-        (r'\text{max}', 'max'),
-        (r'\text{min}', 'min'),
-    ]
-    
-    for old, new in replacements:
-        text = text.replace(old, new)
+    for element in list(src_doc.element.body):
+        tag = element.tag.split('}')[-1]
         
-    # Clean up any \text{...} wrappers
-    text = re.sub(r'\\text\{([^}]+)\}', r'\1', text)
-    # Remove math dollar signs surrounding words/variables if present
-    text = re.sub(r'\$([^$]+)\$', r'\1', text)
-    
-    return text
-
-def set_cell_background(cell, fill_hex):
-    tcPr = cell._element.get_or_add_tcPr()
-    shd = parse_xml(f'<w:shd {nsdecls("w")} w:fill="{fill_hex}"/>')
-    tcPr.append(shd)
-
-def set_cell_margins(cell, top=140, bottom=140, left=180, right=180):
-    tcPr = cell._element.get_or_add_tcPr()
-    tcMar = OxmlElement('w:tcMar')
-    for m, val in [('top', top), ('bottom', bottom), ('left', left), ('right', right)]:
-        node = OxmlElement(f'w:{m}')
-        node.set(qn('w:w'), str(val))
-        node.set(qn('w:type'), 'dxa')
-        tcMar.append(node)
-    tcPr.append(tcMar)
-
-def format_table(table, headers, data):
-    table.alignment = WD_TABLE_ALIGNMENT.CENTER
-    hdr_cells = table.rows[0].cells
-    for i, title in enumerate(headers):
-        clean_title = clean_text_equations(title.strip())
-        hdr_cells[i].text = clean_title
-        set_cell_background(hdr_cells[i], "F2F2F2")  # Light gray background for clean academic style
-        set_cell_margins(hdr_cells[i], top=140, bottom=140, left=180, right=180)
-        p = hdr_cells[i].paragraphs[0]
-        p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        p.paragraph_format.line_spacing = 1.15
-        for run in p.runs:
-            run.font.name = 'Times New Roman'
-            run.font.bold = True
-            run.font.size = Pt(10.5)
-            run.font.color.rgb = RGBColor(0, 0, 0)  # Pure black text
-
-    for r_idx, row_data in enumerate(data):
-        row_cells = table.rows[r_idx + 1].cells
-        bg_color = "FAFAFA" if r_idx % 2 == 1 else "FFFFFF"
-        for c_idx, val in enumerate(row_data):
-            if c_idx < len(row_cells):
-                clean_val = clean_text_equations(val.strip())
-                row_cells[c_idx].text = clean_val
-                set_cell_background(row_cells[c_idx], bg_color)
-                set_cell_margins(row_cells[c_idx], top=100, bottom=100, left=150, right=150)
-                p = row_cells[c_idx].paragraphs[0]
-                p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-                p.paragraph_format.line_spacing = 1.15
-                for run in p.runs:
-                    run.font.name = 'Times New Roman'
-                    run.font.size = Pt(10)
-                    run.font.color.rgb = RGBColor(0, 0, 0)  # Pure black text
-
-def append_markdown_to_doc(md_filepath, doc):
-    with open(md_filepath, 'r', encoding='utf-8') as f:
-        lines = f.readlines()
-
-    in_code_block = False
-    code_lines = []
-    in_table = False
-    table_headers = []
-    table_rows = []
-
-    for line in lines:
-        line_str = line.rstrip('\r\n')
-
-        # Code block handling
-        if line_str.startswith('```'):
-            if in_code_block:
-                in_code_block = False
-                table = doc.add_table(rows=1, cols=1)
-                table.alignment = WD_TABLE_ALIGNMENT.CENTER
-                cell = table.cell(0, 0)
-                set_cell_background(cell, "F8F9FA")
-                set_cell_margins(cell, top=140, bottom=140, left=180, right=180)
-                p = cell.paragraphs[0]
-                p.paragraph_format.space_before = Pt(4)
-                p.paragraph_format.space_after = Pt(4)
-                p.paragraph_format.line_spacing = 1.05
-                run = p.add_run('\n'.join(code_lines))
-                run.font.name = 'Consolas'
-                run.font.size = Pt(9.5)
-                run.font.color.rgb = RGBColor(0, 0, 0)  # Pure black code text
-                
-                p_space = doc.add_paragraph()
-                p_space.paragraph_format.space_after = Pt(6)
-                code_lines = []
+        if tag == 'p':
+            drawings = element.xpath('.//w:drawing')
+            if drawings:
+                blips = element.xpath('.//a:blip')
+                for b in blips:
+                    rId = b.attrib.get('{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed')
+                    if rId and rId in src_doc.part.rels:
+                        image_part = src_doc.part.rels[rId].target_part
+                        image_bytes = image_part._blob
+                        
+                        p_img = dest_doc.add_paragraph()
+                        p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                        p_img.paragraph_format.space_before = Pt(14)
+                        p_img.paragraph_format.space_after = Pt(4)
+                        p_img.paragraph_format.keep_with_next = True
+                        
+                        run = p_img.add_run()
+                        run.add_picture(io.BytesIO(image_bytes), width=Inches(6.2))
             else:
-                in_code_block = True
-                code_lines = []
-            continue
-
-        if in_code_block:
-            code_lines.append(line_str)
-            continue
-
-        # Table handling
-        if '|' in line_str and not line_str.startswith('```'):
-            parts = [p.strip() for p in line_str.split('|')[1:-1]]
-            if not parts:
-                continue
-            if all(set(p).issubset({'-', ':', ' '}) for p in parts if p):
-                continue
-            if not in_table:
-                in_table = True
-                table_headers = parts
-                table_rows = []
-            else:
-                table_rows.append(parts)
-            continue
-        else:
-            if in_table:
-                in_table = False
-                if table_headers and table_rows:
-                    cols = len(table_headers)
-                    table = doc.add_table(rows=len(table_rows) + 1, cols=cols)
-                    format_table(table, table_headers, table_rows)
-                    p_space = doc.add_paragraph()
-                    p_space.paragraph_format.space_after = Pt(6)
-                table_headers = []
-                table_rows = []
-
-        if not line_str.strip():
-            continue
-
-        # Image handling ![Caption](file:///path/to/image.png)
-        img_match = re.search(r'!\[(.*?)\]\((file:///.*?|.*?)\)', line_str)
-        if img_match:
-            caption = img_match.group(1)
-            img_path = img_match.group(2).replace('file://', '')
-            if os.path.exists(img_path):
-                p_img = doc.add_paragraph()
-                p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                p_img.paragraph_format.space_before = Pt(14)
-                p_img.paragraph_format.space_after = Pt(4)
-                p_img.paragraph_format.keep_with_next = True
-                run = p_img.add_run()
-                run.add_picture(img_path, width=Inches(6.2))
-
-                p_cap = doc.add_paragraph()
-                p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                p_cap.paragraph_format.space_before = Pt(2)
-                p_cap.paragraph_format.space_after = Pt(14)
-                
-                # Format "Figure X.Y:" as Bold Times New Roman and description text as Italic
-                clean_cap = clean_text_equations(caption)
-                fig_prefix_match = re.match(r'^(Figure\s+\d+\.\d+:?\s*)(.*)$', clean_cap, re.IGNORECASE)
-                if fig_prefix_match:
-                    prefix = fig_prefix_match.group(1)
-                    rest = fig_prefix_match.group(2)
+                p_src = None
+                for p in src_doc.paragraphs:
+                    if p._element == element:
+                        p_src = p
+                        break
+                        
+                if p_src and p_src.text.strip():
+                    p_new = dest_doc.add_paragraph()
+                    p_new.style = p_src.style
+                    p_new.alignment = p_src.alignment
+                    p_new.paragraph_format.space_before = p_src.paragraph_format.space_before
+                    p_new.paragraph_format.space_after = p_src.paragraph_format.space_after
+                    p_new.paragraph_format.line_spacing = p_src.paragraph_format.line_spacing
                     
-                    run_pre = p_cap.add_run(prefix)
-                    run_pre.font.name = 'Times New Roman'
-                    run_pre.font.size = Pt(10)
-                    run_pre.font.bold = True
-                    run_pre.font.color.rgb = RGBColor(0, 0, 0)
-                    
-                    run_rest = p_cap.add_run(rest)
-                    run_rest.font.name = 'Times New Roman'
-                    run_rest.font.size = Pt(10)
-                    run_rest.font.italic = True
-                    run_rest.font.color.rgb = RGBColor(0, 0, 0)
-                else:
-                    run_cap = p_cap.add_run(clean_cap)
-                    run_cap.font.name = 'Times New Roman'
-                    run_cap.font.size = Pt(10)
-                    run_cap.font.italic = True
-                    run_cap.font.color.rgb = RGBColor(0, 0, 0)
-            continue
-
-        # Horizontal Rule
-        if line_str.strip() == '---':
-            p = doc.add_paragraph()
-            p.paragraph_format.space_before = Pt(8)
-            p.paragraph_format.space_after = Pt(8)
-            continue
-
-        # Clean line text equation strings
-        line_clean = clean_text_equations(line_str)
-
-        # Headings
-        if line_clean.startswith('# '):
-            p = doc.add_paragraph()
-            p.paragraph_format.space_before = Pt(18)
-            p.paragraph_format.space_after = Pt(8)
-            p.paragraph_format.keep_with_next = True
-            run = p.add_run(line_clean[2:])
-            run.font.name = 'Times New Roman'
-            run.font.size = Pt(16)
-            run.bold = True
-            run.font.color.rgb = RGBColor(0, 0, 0)
-        elif line_clean.startswith('## '):
-            p = doc.add_paragraph()
-            p.paragraph_format.space_before = Pt(14)
-            p.paragraph_format.space_after = Pt(6)
-            p.paragraph_format.keep_with_next = True
-            run = p.add_run(line_clean[3:])
-            run.font.name = 'Times New Roman'
-            run.font.size = Pt(14)
-            run.bold = True
-            run.font.color.rgb = RGBColor(0, 0, 0)
-        elif line_clean.startswith('### '):
-            p = doc.add_paragraph()
-            p.paragraph_format.space_before = Pt(12)
-            p.paragraph_format.space_after = Pt(4)
-            p.paragraph_format.keep_with_next = True
-            run = p.add_run(line_clean[4:])
-            run.font.name = 'Times New Roman'
-            run.font.size = Pt(12.5)
-            run.bold = True
-            run.font.color.rgb = RGBColor(0, 0, 0)
-        elif line_clean.startswith('#### '):
-            p = doc.add_paragraph()
-            p.paragraph_format.space_before = Pt(10)
-            p.paragraph_format.space_after = Pt(4)
-            p.paragraph_format.keep_with_next = True
-            run = p.add_run(line_clean[5:])
-            run.font.name = 'Times New Roman'
-            run.font.size = Pt(12)
-            run.bold = True
-            run.font.color.rgb = RGBColor(0, 0, 0)
-        else:
-            p = doc.add_paragraph()
-            p.paragraph_format.space_before = Pt(0)
-            p.paragraph_format.space_after = Pt(6)
-            p.paragraph_format.line_spacing = 1.5
-
-            parts = re.split(r'(\*\*.*?\*\*)', line_clean)
-            for part in parts:
-                if part.startswith('**') and part.endswith('**'):
-                    run = p.add_run(part[2:-2])
-                    run.bold = True
-                else:
-                    run = p.add_run(part)
-                run.font.name = 'Times New Roman'
-                run.font.size = Pt(12)
-                run.font.color.rgb = RGBColor(0, 0, 0)
-
-    if in_table and table_headers and table_rows:
-        cols = len(table_headers)
-        table = doc.add_table(rows=len(table_rows) + 1, cols=cols)
-        format_table(table, table_headers, table_rows)
-
-def parse_markdown_to_docx(md_filepath, docx_filepath):
-    doc = docx.Document()
-    for s in doc.sections:
-        s.top_margin = Inches(1)
-        s.bottom_margin = Inches(1)
-        s.left_margin = Inches(1)
-        s.right_margin = Inches(1)
-
-    append_markdown_to_doc(md_filepath, doc)
-    doc.save(docx_filepath)
-    print(f"Successfully generated Word Document at {docx_filepath}")
+                    for run in p_src.runs:
+                        r_new = p_new.add_run(run.text)
+                        r_new.bold = run.bold
+                        r_new.italic = run.italic
+                        r_new.font.name = 'Times New Roman'
+                        if run.font.size:
+                            r_new.font.size = run.font.size
+                            
+        elif tag == 'tbl':
+            tbl_clone = deepcopy(element)
+            sectPr.addprevious(tbl_clone)
 
 def generate_combined_chapter_4_and_5():
     docs_dir = os.path.join(os.path.dirname(__file__), 'docs')
@@ -308,12 +67,7 @@ def generate_combined_chapter_4_and_5():
 
     doc4 = docx.Document(ch4_docx)
     doc4.add_page_break()
-    sectPr = doc4.element.body.xpath('w:sectPr')[0]
-    doc5 = docx.Document(ch5_docx)
-    for element in list(doc5.element.body):
-        tag = element.tag.split('}')[-1]
-        if tag in ('p', 'tbl'):
-            sectPr.addprevious(element)
+    append_doc_with_rebound_images_and_tables(ch5_docx, doc4)
     doc4.save(combined_docx)
     print(f"Successfully generated Combined Chapter 4 & 5 Word Document at {combined_docx}")
 
@@ -325,21 +79,10 @@ def generate_full_dissertation():
     full_docx = os.path.join(docs_dir, 'Chapter_1_2_3_4_5_Eunice.docx')
 
     doc123 = docx.Document(ch123_docx)
-    sectPr = doc123.element.body.xpath('w:sectPr')[0]
-    
-    doc4 = docx.Document(ch4_docx)
     doc123.add_page_break()
-    for element in list(doc4.element.body):
-        tag = element.tag.split('}')[-1]
-        if tag in ('p', 'tbl'):
-            sectPr.addprevious(element)
-
-    doc5 = docx.Document(ch5_docx)
+    append_doc_with_rebound_images_and_tables(ch4_docx, doc123)
     doc123.add_page_break()
-    for element in list(doc5.element.body):
-        tag = element.tag.split('}')[-1]
-        if tag in ('p', 'tbl'):
-            sectPr.addprevious(element)
+    append_doc_with_rebound_images_and_tables(ch5_docx, doc123)
 
     doc123.save(full_docx)
     print(f"Successfully generated Full Dissertation Word Document at {full_docx}")

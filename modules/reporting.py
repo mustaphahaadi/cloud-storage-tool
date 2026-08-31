@@ -80,11 +80,11 @@ def app():
             color='Algorithm',
             labels={'Cost ($)': 'Cumulative Operational Cost ($)'},
             title="Cumulative Operational Cost Comparison (Lower is Better)",
-            template="plotly_dark"
+            template="plotly_white"
         )
         fig_comp.update_layout(
-            paper_bgcolor="#1E293B",
-            plot_bgcolor="#0F172A",
+            paper_bgcolor="#FFFFFF",
+            plot_bgcolor="#F8FAFC",
             margin=dict(l=10, r=10, t=40, b=10)
         )
         st.plotly_chart(fig_comp, width="stretch")

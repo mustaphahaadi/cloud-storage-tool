@@ -222,16 +222,16 @@ def app():
                     text="Recommended Tier",
                     markers=True,
                     title="Impact of Cost Weight (α) on Tier Selection & Monthly Cost",
-                    template="plotly_dark"
+                    template="plotly_white"
                 )
                 fig_sens.update_traces(
-                    line=dict(color="#3B82F6", width=3),
-                    marker=dict(size=8, color="#10B981"),
+                    line=dict(color="#2563EB", width=3),
+                    marker=dict(size=8, color="#059669"),
                     textposition="top center"
                 )
                 fig_sens.update_layout(
-                    paper_bgcolor="#1E293B",
-                    plot_bgcolor="#0F172A",
+                    paper_bgcolor="#FFFFFF",
+                    plot_bgcolor="#F8FAFC",
                     margin=dict(l=20, r=20, t=50, b=20)
                 )
                 st.plotly_chart(fig_sens, width="stretch")
